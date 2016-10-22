@@ -1,4 +1,4 @@
-#!groovy
+#!/usr/bin/env groovy
 
 node('master') {
   currentBuild.result = "SUCCESS"
@@ -38,7 +38,7 @@ node('master') {
   }
 }
 
-# Configures RVM for the workspace
+// Configures RVM for the workspace
 def usingRvm(Closure pipeline) {
   sh 'source ~/.rvm/scripts/rvm'
   sh 'rvm use --install --create 2.2.5@devsecops'
