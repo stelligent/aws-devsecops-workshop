@@ -40,7 +40,7 @@ node('master') {
 
 // Configures RVM for the workspace
 def usingRvm(Closure pipeline) {
-  sh 'source ~/.rvm/scripts/rvm'
+  sh '. ~/.rvm/scripts/rvm'
   sh 'rvm use --install --create 2.2.5@devsecops'
   sh 'export > rvm.env'
   sh 'which bundle || gem install bundler'
