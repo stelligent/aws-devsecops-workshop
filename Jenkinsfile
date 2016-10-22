@@ -1,8 +1,6 @@
 #!/usr/bin/env groovy
 
 node('master') {
-  currentBuild.result = "SUCCESS"
-
   try {
       stage('Commit') {
         withRvm {
