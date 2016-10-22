@@ -1,8 +1,5 @@
 #!/usr/bin/env groovy
 
-def rubyVersion = 'ruby-2.2.5'
-def rvmGemset = 'devsecops'
-
 node('master') {
   currentBuild.result = "SUCCESS"
 
@@ -63,21 +60,26 @@ node('master') {
 
 // Configures RVM for the workspace
 def withRvm(Closure stage) {
-    RVM_HOME='$HOME/.rvm'
-    paths = [
-        "$RVM_HOME/gems/$rubyVersion@$rvmGemset/bin",
-        "$RVM_HOME/gems/$rubyVersion@global/bin",
-        "$RVM_HOME/rubies/$rubyVersion/bin",
-        "$RVM_HOME/bin",
-        "${env.PATH}"
-    ]
-    env.PATH = paths.join(':')
-    env.GEM_HOME = "$RVM_HOME/gems/$rubyVersion@$rvmGemset"
-    env.GEM_PATH = "$RVM_HOME/gems/$rubyVersion@$rvmGemset:$RVM_HOME/gems/$rubyVersion@global"
-    env.MY_RUBY_HOME = "$RVM_HOME/rubies/$rubyVersion"
-    env.IRBRC = "$RVM_HOME/rubies/$rubyVersion/.irbrc"
-    env.RUBY_VERSION = "$rubyVersion"
-    stage()
+  rubyVersion = 'ruby-2.2.5'
+  rvmGemset = 'devsecops'
+  RVM_HOME = '$HOME/.rvm'
+
+  paths = [
+      "$RVM_HOME/gems/$rubyVersion@$rvmGemset/bin",
+      "$RVM_HOME/gems/$rubyVersion@global/bin",
+      "$RVM_HOME/rubies/$rubyVersion/bin",
+      "$RVM_HOME/bin",
+      "${env.PATH}"
+  ]
+
+  env.PATH = paths.join(':')
+  env.GEM_HOME = "$RVM_HOME/gems/$rubyVersion@$rvmGemset"
+  env.GEM_PATH = "$RVM_HOME/gems/$rubyVersion@$rvmGemset:$RVM_HOME/gems/$rubyVersion@global"
+  env.MY_RUBY_HOME = "$RVM_HOME/rubies/$rubyVersion"
+  env.IRBRC = "$RVM_HOME/rubies/$rubyVersion/.irbrc"
+  env.RUBY_VERSION = "$rubyVersion"
+
+  stage()
 }
 
 // Helper function for rake
