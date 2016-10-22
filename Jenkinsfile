@@ -6,14 +6,14 @@ node('master') {
   try {
       stage('Commit') {
         withRvm {
-          print 'Checkout SCM'
+          // Checkout SCM
           checkout scm
 
-          print 'Configure Workspace'
+          // Configure Workspace
           sh 'which bundle || gem install bundler'
           sh 'bundle install'
 
-          print 'Static Analysis'
+          // Static Analysis
           rake 'rubocop'
         }
       }
