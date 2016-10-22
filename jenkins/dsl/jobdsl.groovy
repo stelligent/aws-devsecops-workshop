@@ -9,7 +9,8 @@ pipelineJob('aws-devsecops-workshop') {
                 git {
                     branch('master')
                     remote {
-                        github('stelligent/aws-devsecops-workshop')
+                        credentials('jenkins')
+                        url('git@github.com:stelligent/aws-devsecops-workshop.git')
                     }
                 }
             }
