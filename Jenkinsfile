@@ -10,18 +10,23 @@ node('master') {
       checkout scm
       sh 'echo "Configure Workspace"'
       sh 'echo "Static Analysis"'
+
+    stage 'Build/Test'
       sh 'echo "Build"'
+      sh 'echo "Unit Tests"'
+
+    stage 'Acceptance'
+      sh 'echo "Integration Tests"'
+      sh 'echo "Infrastructure Tests"'
 
     stage 'Security'
       sh 'echo "CFN Nag"'
       sh 'echo "Config Rules"'
       sh 'echo "OWASP Zap!"'
 
-    stage 'Acceptance'
-      sh 'echo "Integration Tests"'
-
     stage 'Deployment'
       sh 'echo "Deployment to UAT"'
+      sh 'echo "Smoke Tests"'
 
   } catch(err) {
 
