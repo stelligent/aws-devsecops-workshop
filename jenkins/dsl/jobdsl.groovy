@@ -1,14 +1,20 @@
 pipelineJob('aws-devsecops-workshop') {
-    scm {
-        github('stelligent/aws-devsecops-workshop', 'master')
-    }
-    triggers {
-        githubPush()
-    }
+    displayName('AWS DevSecOps Workshop Pipeline')
+
+    description('An example pipeline showcasing the deployment of an application with a security focused pipeline.')
+
     definition {
-        cps {
-            script('Jenkinsfile')
-            sandbox()
+        cpsScm {
+            scm {
+                git {
+                    branch('master')
+                    remote {
+                        github('stelligent/aws-devsecops-workshop')
+                    }
+                }
+            }
+
+            scriptPath('Jenkinsfile')
         }
     }
 }
