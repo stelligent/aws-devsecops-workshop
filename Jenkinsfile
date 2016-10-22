@@ -7,7 +7,7 @@ node('master') {
   currentBuild.result = "SUCCESS"
 
   try {
-      stage 'Commit' {
+      stage('Commit') {
         withRvm {
           checkout scm
           sh 'echo "Configure Workspace"'
@@ -17,21 +17,21 @@ node('master') {
         }
       }
 
-      stage 'Build/Test' {
+      stage('Build/Test') {
         withRvm {
           sh 'echo "Build"'
           sh 'echo "Unit Tests"'
         }
       }
 
-      stage 'Acceptance' {
+      stage('Acceptance') {
         withRvm {
           sh 'echo "Integration Tests"'
           sh 'echo "Infrastructure Tests"'
         }
       }
 
-      stage 'Security' {
+      stage('Security') {
         withRvm {
           sh 'echo "CFN Nag"'
           sh 'echo "Config Rules"'
@@ -39,7 +39,7 @@ node('master') {
         }
       }
 
-      stage 'Deployment' {
+      stage('Deployment') {
         withRvm {
           sh 'echo "Deployment to UAT"'
           sh 'echo "Smoke Tests"'
