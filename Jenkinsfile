@@ -47,6 +47,10 @@ node('master') {
       }
 
   } catch(err) {
+    println(err.toString());
+    println(err.getMessage());
+    println(err.getStackTrace());
+
     mail  body: "project build error is here: ${env.BUILD_URL}" ,
           from: 'aws-devsecops-workshop@stelligent.com',
           replyTo: 'no-reply@stelligent.com',
