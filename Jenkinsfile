@@ -45,11 +45,6 @@ node('master') {
 
 // Configures RVM for the workspace
 def usingRvm(Closure pipeline) {
-  configureRvmEnvironment(pipeline)
-}
-
-// Sets up the environment for RVM
-def configureRvmEnvironment(Closure pipeline) {
     RVM_HOME='$HOME/.rvm'
     paths = [
         "$RVM_HOME/gems/$rubyVersion@$rvmGemset/bin",
