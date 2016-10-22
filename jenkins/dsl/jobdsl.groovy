@@ -1,4 +1,4 @@
-pipelineJob('seed-aws-devsecops-workshop') {
+pipelineJob('aws-devsecops-workshop') {
     scm {
         github('stelligent/aws-devsecops-workshop', 'master')
     }
