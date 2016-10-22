@@ -58,7 +58,7 @@ node('master') {
 }
 
 // Configures RVM for the workspace
-def usingRvm(Closure stage) {
+def withRvm(Closure stage) {
     RVM_HOME='$HOME/.rvm'
     paths = [
         "$RVM_HOME/gems/$rubyVersion@$rvmGemset/bin",
