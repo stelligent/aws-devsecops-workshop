@@ -1,3 +1,5 @@
+def rubyVersion = 'ruby-2.2.5@devsecops'
+
 pipelineJob('aws-devsecops-workshop') {
   displayName('AWS DevSecOps Workshop Pipeline')
 
@@ -17,6 +19,10 @@ pipelineJob('aws-devsecops-workshop') {
 
       scriptPath('Jenkinsfile')
     }
+  }
+
+  wrappers {
+    rvm(rubyVersion)
   }
 
   triggers {
