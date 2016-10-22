@@ -7,31 +7,40 @@ node('master') {
   currentBuild.result = "SUCCESS"
 
   try {
-    usingRvm {
       stage 'Commit'
-        checkout scm
-        sh 'echo "Configure Workspace"'
-        sh 'which bundle || gem install bundler'
-        sh 'bundle install'
-        sh 'echo "Static Analysis"'
+        withRvm {
+          checkout scm
+          sh 'echo "Configure Workspace"'
+          sh 'which bundle || gem install bundler'
+          sh 'bundle install'
+          sh 'echo "Static Analysis"'
+        }
 
       stage 'Build/Test'
-        sh 'echo "Build"'
-        sh 'echo "Unit Tests"'
+        withRvm {
+          sh 'echo "Build"'
+          sh 'echo "Unit Tests"'
+        }
 
       stage 'Acceptance'
-        sh 'echo "Integration Tests"'
-        sh 'echo "Infrastructure Tests"'
+        withRvm {
+          sh 'echo "Integration Tests"'
+          sh 'echo "Infrastructure Tests"'
+        }
 
       stage 'Security'
-        sh 'echo "CFN Nag"'
-        sh 'echo "Config Rules"'
-        sh 'echo "OWASP Zap!"'
+        withRvm {
+          sh 'echo "CFN Nag"'
+          sh 'echo "Config Rules"'
+          sh 'echo "OWASP Zap!"'
+        }
 
       stage 'Deployment'
-        sh 'echo "Deployment to UAT"'
-        sh 'echo "Smoke Tests"'
-    }
+        withRvm {
+          sh 'echo "Deployment to UAT"'
+          sh 'echo "Smoke Tests"'
+        }
+
   } catch(err) {
     mail  body: "project build error is here: ${env.BUILD_URL}" ,
           from: 'aws-devsecops-workshop@stelligent.com',
@@ -44,7 +53,7 @@ node('master') {
 }
 
 // Configures RVM for the workspace
-def usingRvm(Closure pipeline) {
+def usingRvm(Closure stage) {
     RVM_HOME='$HOME/.rvm'
     paths = [
         "$RVM_HOME/gems/$rubyVersion@$rvmGemset/bin",
@@ -59,7 +68,7 @@ def usingRvm(Closure pipeline) {
     env.MY_RUBY_HOME = "$RVM_HOME/rubies/$rubyVersion"
     env.IRBRC = "$RVM_HOME/rubies/$rubyVersion/.irbrc"
     env.RUBY_VERSION = "$rubyVersion"
-    pipeline()
+    stage()
 }
 
 // Helper function for rake
