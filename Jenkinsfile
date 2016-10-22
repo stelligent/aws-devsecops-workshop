@@ -7,7 +7,7 @@ node('master') {
   currentBuild.result = "SUCCESS"
 
   try {
-      stage 'Commit'
+      stage 'Commit' {
         withRvm {
           checkout scm
           sh 'echo "Configure Workspace"'
@@ -15,31 +15,36 @@ node('master') {
           sh 'bundle install'
           sh 'echo "Static Analysis"'
         }
+      }
 
-      stage 'Build/Test'
+      stage 'Build/Test' {
         withRvm {
           sh 'echo "Build"'
           sh 'echo "Unit Tests"'
         }
+      }
 
-      stage 'Acceptance'
+      stage 'Acceptance' {
         withRvm {
           sh 'echo "Integration Tests"'
           sh 'echo "Infrastructure Tests"'
         }
+      }
 
-      stage 'Security'
+      stage 'Security' {
         withRvm {
           sh 'echo "CFN Nag"'
           sh 'echo "Config Rules"'
           sh 'echo "OWASP Zap!"'
         }
+      }
 
-      stage 'Deployment'
+      stage 'Deployment' {
         withRvm {
           sh 'echo "Deployment to UAT"'
           sh 'echo "Smoke Tests"'
         }
+      }
 
   } catch(err) {
     mail  body: "project build error is here: ${env.BUILD_URL}" ,
