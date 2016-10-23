@@ -16,4 +16,4 @@ A continuous security pipeline demo for the AWS DevSecOps Workshop.
 Create a pipeline job in jenkins to use this repository's Jenkinsfile to build the pipeline. You'll need to configure the RVM environment to use the gemset `2.2.5@devsecops`.
 
 #### Option 2: Job DSL
-If you have the [Job DSL](https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin) plugin installed, you can execute `jenkins/dsl/jobdsl.groovy` to create your pipeline.
+If you have the [Job DSL](https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin) plugin installed, you can execute `pipeline/jobs/jobdsl.groovy` to create your pipeline.
