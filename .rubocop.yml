@@ -1,0 +1,3 @@
+# CloudFormation DSL
+BlockLength:
+  Max: 250
