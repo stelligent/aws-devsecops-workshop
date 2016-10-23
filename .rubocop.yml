@@ -1,3 +1,6 @@
 # CloudFormation DSL
 BlockLength:
   Max: 250
+
+ClassLength:
+  Max: 150
