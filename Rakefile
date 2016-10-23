@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
-begin
-  require 'rubocop/rake_task'
-  RuboCop::RakeTask.new(:rubocop)
-rescue LoadError
-  print "Unable to load rubocop/rake_task, rubocop tests missing\n"
+$LOAD_PATH << './pipeline/lib'
+
+# Load any .rake files under the current directory
+Dir.glob('**/*.rake').each do |task_file|
+  load task_file
 end

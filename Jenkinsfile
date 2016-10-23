@@ -11,52 +11,66 @@ node('master') {
           sh 'which bundle || gem install bundler'
           sh 'bundle install'
 
-          // Static Analysis
-          rake 'rubocop'
-        }
-      }
+          // Build
+          rake 'commit:build'
 
-      stage('Build/Test') {
-        withRvm {
-          sh 'echo "Build"'
-          sh 'echo "Unit Tests"'
+          // Static Analysis
+          rake 'commit:static_analysis'
+
+          // Security / Static Analysis
+          rake 'commit:security_test'
+
+          // Unit Tests
+          rake 'commit:unit_test'
         }
       }
 
       stage('Acceptance') {
         withRvm {
-          sh 'echo "Integration Tests"'
-          sh 'echo "Infrastructure Tests"'
+          // Create Acceptance Environment
+          rake 'acceptance:create_environment'
+
+          try {
+            // Infrastructure Tests
+            rake 'acceptance:infrastructure_test'
+
+            // Integration Tests
+            rake 'acceptance:integration_test'
+
+            // Security / Integration Tests
+            rake 'acceptance:security_test'
+          } catch(err) {
+            // Teardown Acceptance Environment
+            rake 'acceptance:teardown_environment'
+
+            // Bubble up the exception to the pipeline
+            handleException(err)
+          }
         }
       }
 
-      stage('Security') {
+      stage('Capacity') {
         withRvm {
-          sh 'echo "CFN Nag"'
-          sh 'echo "Config Rules"'
-          sh 'echo "OWASP Zap!"'
+          // Security / Penetration Tests
+          rake 'capacity:security_test'
+
+          // Capacity Test
+          rake 'capacity:capacity_test'
         }
       }
 
       stage('Deployment') {
         withRvm {
-          sh 'echo "Deployment to UAT"'
-          sh 'echo "Smoke Tests"'
+          // Deployment
+          rake 'deployment:production'
+
+          // Deployment Verification
+          rake 'deployment:smoke_test'
         }
       }
 
   } catch(err) {
-    println(err.toString());
-    println(err.getMessage());
-    println(err.getStackTrace());
-
-    mail  body: "project build error is here: ${env.BUILD_URL}" ,
-          from: 'aws-devsecops-workshop@stelligent.com',
-          replyTo: 'no-reply@stelligent.com',
-          subject: 'AWS DevSecOps Workshop Pipeline Build Failed',
-          to: 'robert.murphy@stelligent.com'
-
-    throw err
+    handleException(err)
   }
 }
 
@@ -87,4 +101,21 @@ def withRvm(Closure stage) {
 // Helper function for rake
 def rake(String command) {
   sh "bundle exec rake $command"
+}
+
+// Exception helper
+def handleException(Exception err) {
+  println(err.toString());
+  println(err.getMessage());
+  println(err.getStackTrace());
+
+  /* Mail currently not configured
+  mail  body: "project build error is here: ${env.BUILD_URL}" ,
+        from: 'aws-devsecops-workshop@stelligent.com',
+        replyTo: 'no-reply@stelligent.com',
+        subject: 'AWS DevSecOps Workshop Pipeline Build Failed',
+        to: 'robert.murphy@stelligent.com'
+  */
+
+  throw err
 }
