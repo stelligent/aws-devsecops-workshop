@@ -135,9 +135,9 @@ module Pipeline
       return false
     end
 
-    def delete_old_keypair
+    def delete_old_keypair(key_path)
       @ec2.delete_key_pair(key_name: stack_name)
-      File.delete(path_to_file) if File.exist?(path_to_file)
+      File.delete(key_path) if File.exist?(key_path)
     rescue Aws::EC2::Errors::InvalidKeyPairNotFound => error
       puts error # noop
     rescue RuntimeError => error
