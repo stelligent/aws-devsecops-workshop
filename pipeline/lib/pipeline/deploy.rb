@@ -118,7 +118,7 @@ module Pipeline
       key_path = "#{stack_name}.pem"
       return stack_name if keypair_exists?(key_path)
 
-      delete_old_keypair(key_path)# if keypair_exists?(key_path)
+      delete_old_keypair(key_path) # if keypair_exists?(key_path)
 
       key_material = @ec2.create_key_pair(key_name: stack_name).key_material
       File.write(key_path, key_material)
