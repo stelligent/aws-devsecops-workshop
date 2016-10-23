@@ -1,10 +1,19 @@
 #!/usr/bin/env ruby
 
 require 'rspec/core/rake_task'
+require 'cucumber/rake/task'
 
 namespace :acceptance do
   desc 'Integration test the acceptance environment'
-  RSpec::Core::RakeTask.new(:integration_test) do |t|
+  task integration_test: [:'acceptance:serverspec', :'acceptance:cucumber']
+
+  desc 'Integration tests for server configuration'
+  RSpec::Core::RakeTask.new(:serverspec) do |t|
     t.pattern = 'test/integration/serverspec/spec/**/*_spec.rb'
+  end
+
+  desc 'Integration tests for web service'
+  Cucumber::Rake::Task.new(:cucumber) do |t|
+    t.cucumber_opts = 'test/features --require test/features/step_definitions'
   end
 end

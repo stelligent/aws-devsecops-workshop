@@ -6,6 +6,8 @@ ruby '2.2.5'
 
 gem 'aws-sdk'
 gem 'cfndsl'
+gem 'cucumber'
+gem 'eat'
 gem 'english'
 gem 'rubocop'
 gem 'serverspec'
