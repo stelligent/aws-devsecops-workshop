@@ -14,7 +14,7 @@ CloudFormation do
 
   Parameter(:InstanceType) do
     Description 'EC2 Instance Type to deploy.'
-    Type 'AWS::EC2::Subnet::Id'
+    Type 'String'
     Default 't2.micro'
   end
 
@@ -40,10 +40,20 @@ CloudFormation do
     AllowedValues %w(acceptance production)
   end
 
+  Parameter(:JenkinsCIDR) do
+    Description 'CIDR block for jenkins to access web server.'
+    Type 'String'
+  end
+
+  Parameter(:WorldCIDR) do
+    Description 'CIDR block for users to access web server.'
+    Type 'String'
+  end
+
   Condition :IsProduction, FnEquals(Ref(:Environment), 'production')
   Condition :IsAcceptance, FnEquals(Ref(:Environment), 'acceptance')
 
-  EC2_SecurityGroup(:SecurityGroup) do
+  EC2_SecurityGroup(:SecurityGroupAcceptance) do
     Condition :IsAcceptance
     VpcId Ref(:VPCID)
     GroupDescription 'SSH and HTTP access for acceptance testing.'
@@ -52,18 +62,38 @@ CloudFormation do
         IpProtocol: 'tcp',
         FromPort: '80',
         ToPort: '80',
-        CidrIp: '0.0.0.0/0'
+        CidrIp: Ref(:JenkinsCIDR)
       },
       {
         IpProtocol: 'tcp',
         FromPort: '22',
         ToPort: '22',
-        CidrIp: '0.0.0.0/0'
+        CidrIp: Ref(:JenkinsCIDR)
+      }
+    ]
+    SecurityGroupEgress [
+      {
+        IpProtocol: 'tcp',
+        FromPort: '80',
+        ToPort: '80',
+        CidrIp: Ref(:WorldCIDR)
+      },
+      {
+        IpProtocol: 'tcp',
+        FromPort: '443',
+        ToPort: '443',
+        CidrIp: Ref(:WorldCIDR)
+      },
+      {
+        IpProtocol: 'tcp',
+        FromPort: '22',
+        ToPort: '22',
+        CidrIp: Ref(:JenkinsCIDR)
       }
     ]
   end
 
-  EC2_SecurityGroup(:SecurityGroup) do
+  EC2_SecurityGroup(:SecurityGroupProduction) do
     Condition :IsProduction
     VpcId Ref(:VPCID)
     GroupDescription 'HTTP access for deployment.'
@@ -72,7 +102,21 @@ CloudFormation do
         IpProtocol: 'tcp',
         FromPort: '80',
         ToPort: '80',
-        CidrIp: '0.0.0.0/0'
+        CidrIp: Ref(:WorldCIDR)
+      }
+    ]
+    SecurityGroupEgress [
+      {
+        IpProtocol: 'tcp',
+        FromPort: '80',
+        ToPort: '80',
+        CidrIp: Ref(:WorldCIDR)
+      },
+      {
+        IpProtocol: 'tcp',
+        FromPort: '443',
+        ToPort: '443',
+        CidrIp: Ref(:WorldCIDR)
       }
     ]
   end
@@ -80,7 +124,7 @@ CloudFormation do
   CloudFormation_WaitConditionHandle(:WaitHandle)
 
   CloudFormation_WaitCondition(:EC2Waiter) do
-    DependsOn Ref(:WebServer)
+    DependsOn :WebServer
     Handle Ref(:WaitHandle)
     Timeout '300'
   end
@@ -96,7 +140,9 @@ CloudFormation do
         SubnetId: Ref(:SubnetId),
         DeviceIndex: 0,
         GroupSet: [
-          Ref(:SecurityGroup)
+          FnIf(:IsProduction,
+               Ref(:SecurityGroupProduction),
+               Ref(:SecurityGroupAcceptance))
         ]
       }
     ]

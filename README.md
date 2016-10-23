@@ -6,9 +6,11 @@ A continuous security pipeline demo for the AWS DevSecOps Workshop.
 ### Prerequisites
 * Jenkins 2.19+
 * Jenkins Plugins:
-* * [RVM](https://wiki.jenkins-ci.org/display/JENKINS/RVM+Plugin)
-* * [Git](https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin)
-* * [Pipeline](https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin)
+ * [RVM](https://wiki.jenkins-ci.org/display/JENKINS/RVM+Plugin)
+ * [Git](https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin)
+ * [Pipeline](https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin)
+* [jq](https://stedolan.github.io/jq/manual/) installed in path for [cfn-nag](https://github.com/stelligent/cfn_nag)
+ * `apt-get install jq` or `yum install jq`
 
 ### Setting up your pipeline
 
