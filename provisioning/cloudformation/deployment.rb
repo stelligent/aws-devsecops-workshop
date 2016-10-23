@@ -24,19 +24,18 @@ CloudFormation do
   end
 
   Parameter(:SubnetId) do
-    Description 'Subnet ID in your Amazon VPC to deploy \
-      infrastructure into.'
+    Description 'Subnet ID to deploy infrastructure into.'
     Type 'AWS::EC2::Subnet::Id'
   end
 
   Parameter(:KeyPairName) do
-    Description 'Optional EC2 Keypair to use for the deployed ec2 instance.'
+    Description 'Optional EC2 Keypair to use for the deployed EC2 instance.'
     Type 'AWS::EC2::KeyPair::KeyName'
     Default ''
   end
 
   Parameter(:Environment) do
-    Description 'The environment this environment is being deployed into.'
+    Description 'The environment name of this deployment.'
     Type 'String'
     AllowedValues %w(acceptance production)
   end
