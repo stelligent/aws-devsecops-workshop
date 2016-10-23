@@ -122,7 +122,7 @@ module Pipeline
 
       key_material = @ec2.create_key_pair(key_name: stack_name).key_material
       File.write(key_path, key_material)
-      File.chmod('0400', key_path)
+      File.chmod(0400, key_path)
 
       stack_name
     end

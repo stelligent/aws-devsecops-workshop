@@ -4,3 +4,6 @@ BlockLength:
 
 ClassLength:
   Max: 150
+
+NumericLiteralPrefix:
+  Enabled: false
