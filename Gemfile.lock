@@ -96,6 +96,7 @@ DEPENDENCIES
   english
   rubocop
   serverspec
+  trollop
 
 RUBY VERSION
    ruby 2.2.5p319

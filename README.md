@@ -1,20 +1,33 @@
 # aws-devsecops-workshop
 A continuous security pipeline demo for the AWS DevSecOps Workshop.
 
-## Jenkins
+## Setup Jenkins
+This repository contains some scripts to stand up a Jenkins in AWS pre-configured to execute this pipeline.
 
-### Prerequisites
-* Jenkins 2.19+
-* Jenkins Plugins:
- * [RVM](https://wiki.jenkins-ci.org/display/JENKINS/RVM+Plugin)
- * [Git](https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin)
- * [Pipeline](https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin)
-* [jq](https://stedolan.github.io/jq/manual/) installed in path for [cfn-nag](https://github.com/stelligent/cfn_nag)
+**Note** You must run the following scripts from an environment configured with AWS API Credentials or an instance with an IAM role attached with permission to access CloudFormation and EC2.
 
-### Setting up your pipeline
+### Create the Jenkins
+```bash
+$ bundle install
+$ rake jenkins:create['YOUR-VPC-ID','YOUR-SUBNET-ID','YOUR-CIDR-BLOCK']
+# rake jenkins:create['vpc-aad5159f','subnet-e82cd2b5','68.0.0.0/8']
+```
 
-#### Option 1: Pipeline Job
-Create a pipeline job in jenkins to use this repository's Jenkinsfile to build the pipeline. You'll need to configure the RVM environment to use the gemset `2.2.5@devsecops`.
+*Only include a CIDR block if you're running behind a Proxy, TIC or NAT Gateway.*
 
-#### Option 2: Job DSL
-If you have the [Job DSL](https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin) plugin installed, you can execute `pipeline/jobs/jobdsl.groovy` to create your pipeline.
+### Teardown the Jenkins
+```bash
+$ rake jenkins:teardown
+```
+
+### Jenkins Credentials
+The initial admin user to jenkins is preconfigured, the credentials are below.
+
+**Please change the credentials as soon as you create the jenkins!**
+
+#### Login
+* User: `workshop`
+* Password: `Fancy$Treasury!Effective!Throw^6`
+
+#### Github
+You'll need to create a jenkins credential set to access private repositories in Jenkins.
