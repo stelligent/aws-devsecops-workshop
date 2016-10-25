@@ -2,17 +2,17 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.3.0)
-    aws-sdk (2.6.12)
-      aws-sdk-resources (= 2.6.12)
-    aws-sdk-core (2.6.12)
+    aws-sdk (2.6.13)
+      aws-sdk-resources (= 2.6.13)
+    aws-sdk-core (2.6.13)
       jmespath (~> 1.0)
-    aws-sdk-resources (2.6.12)
-      aws-sdk-core (= 2.6.12)
+    aws-sdk-resources (2.6.13)
+      aws-sdk-core (= 2.6.13)
     builder (3.2.2)
     cfn-nag (0.0.19)
       logging (= 2.0.0)
       trollop (= 2.1.2)
-    cfndsl (0.11.5)
+    cfndsl (0.11.6)
     cucumber (2.4.0)
       builder (>= 2.1.2)
       cucumber-core (~> 1.5.0)
@@ -96,7 +96,6 @@ DEPENDENCIES
   english
   rubocop
   serverspec
-  trollop
 
 RUBY VERSION
    ruby 2.2.5p319

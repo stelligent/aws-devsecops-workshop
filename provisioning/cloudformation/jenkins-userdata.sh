@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 # Update Jenkins with some build parameters
 sed -i.bak "s#VPCID_TOKEN#${vpc_id}#g" /var/lib/jenkins/config.xml

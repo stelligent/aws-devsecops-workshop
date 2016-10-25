@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'aws-sdk'
 require 'cfndsl'
-require 'trollop'
 
 region = ENV['AWS_REGION'] unless ENV['AWS_REGION'].nil?
 region = 'us-east-1' if ENV['AWS_REGION'].nil?
@@ -13,6 +13,7 @@ namespace :jenkins do
   task :create, [:vpc_id, :subnet_id, :world_cidr] do |_, opts|
     opts[:world_cidr] = '0.0.0.0/0'
 
+    # Verify user input
     abort 'You must specify a VPC.' if opts[:vpc_id].nil?
     abort 'You must specify a Subnet.' if opts[:subnet_id].nil?
     world_cidr = opts[:world_cidr]
