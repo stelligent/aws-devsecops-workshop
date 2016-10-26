@@ -73,6 +73,7 @@ module Pipeline
         end
       end
 
+      sleep 180 if waiter == :stack_create_complete
       save_stack_info
     rescue Net::HTTPFatalError => exception
       retries -= 1
