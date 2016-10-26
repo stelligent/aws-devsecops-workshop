@@ -154,6 +154,11 @@ CloudFormation do
       {
         Key: 'Environment',
         Value: Ref(:Environment)
+      },
+      {
+        # Avoids 'No Updates to be performed' error
+        Key: 'UUID',
+        Value: `uuidgen`
       }
     ]
 
