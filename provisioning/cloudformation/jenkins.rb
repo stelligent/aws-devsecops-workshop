@@ -3,22 +3,12 @@
 require 'cfndsl'
 
 CloudFormation do
-  Description 'AWS DevSecOps Workshop Jenkins Server'
+  Description 'AWS DevSecOps Workshop Environment + Jenkins (VPC+EC2 Instance)'
 
   Parameter(:InstanceType) do
     Description 'EC2 Instance Type to deploy.'
     Type 'String'
     Default 't2.micro'
-  end
-
-  Parameter(:VPCID) do
-    Description 'Amazon VPC ID to deploy Jenkins into.'
-    Type 'AWS::EC2::VPC::Id'
-  end
-
-  Parameter(:SubnetId) do
-    Description 'Subnet ID to deploy Jenkins into.'
-    Type 'AWS::EC2::Subnet::Id'
   end
 
   Parameter(:WorldCIDR) do
@@ -34,8 +24,68 @@ CloudFormation do
     Default '192.30.252.0/22'
   end
 
+  EC2_VPC(:VPC) do
+    CidrBlock '11.0.0.0/16'
+    EnableDnsSupport 'true'
+    EnableDnsHostnames 'true'
+    Tags [
+      {
+        Key: 'Name',
+        Value: Ref('AWS::StackName')
+      }
+    ]
+  end
+
+  EC2_Subnet(:Subnet) do
+    VpcId Ref(:VPC)
+    CidrBlock '11.0.0.0/20'
+    MapPublicIpOnLaunch true
+    Tags [
+      {
+        Key: 'Name',
+        Value: Ref('AWS::StackName')
+      }
+    ]
+  end
+
+  EC2_InternetGateway(:InternetGateway) do
+    Tags [
+      {
+        Key: 'Name',
+        Value: Ref('AWS::StackName')
+      }
+    ]
+  end
+
+  EC2_VPCGatewayAttachment(:AttachGateway) do
+    VpcId Ref(:VPC)
+    InternetGatewayId Ref(:InternetGateway)
+  end
+
+  EC2_RouteTable(:RouteTable) do
+    VpcId Ref(:VPC)
+    Tags [
+      {
+        Key: 'Name',
+        Value: Ref('AWS::StackName')
+      }
+    ]
+  end
+
+  EC2_Route(:Route) do
+    DependsOn :AttachGateway
+    RouteTableId Ref(:RouteTable)
+    DestinationCidrBlock Ref(:WorldCIDR)
+    GatewayId Ref(:InternetGateway)
+  end
+
+  EC2_SubnetRouteTableAssociation(:SubnetAssociation) do
+    SubnetId Ref(:Subnet)
+    RouteTableId Ref(:RouteTable)
+  end
+
   EC2_SecurityGroup(:SecurityGroup) do
-    VpcId Ref(:VPCID)
+    VpcId Ref(:VPC)
     GroupDescription 'HTTP access for deployment.'
     SecurityGroupIngress [
       {
@@ -43,6 +93,13 @@ CloudFormation do
         IpProtocol: 'tcp',
         FromPort: '8080',
         ToPort: '8080',
+        CidrIp: Ref(:WorldCIDR)
+      },
+      {
+        # DEBUGGING SSH
+        IpProtocol: 'tcp',
+        FromPort: '22',
+        ToPort: '22',
         CidrIp: Ref(:WorldCIDR)
       }
     ]
@@ -90,18 +147,20 @@ CloudFormation do
   CloudFormation_WaitCondition(:EC2Waiter) do
     DependsOn :JenkinsServer
     Handle Ref(:WaitHandle)
-    Timeout '300'
+    Timeout '600'
   end
 
   EC2_Instance(:JenkinsServer) do
+    DependsOn :AttachGateway
     ImageId 'ami-32114e25'
     InstanceType Ref(:InstanceType)
     IamInstanceProfile Ref(:JenkinsInstanceProfile)
+    KeyName 'rmurphy-goldbase'
     NetworkInterfaces [
       {
         AssociatePublicIpAddress: true,
         DeleteOnTermination: true,
-        SubnetId: Ref(:SubnetId),
+        SubnetId: Ref(:Subnet),
         DeviceIndex: 0,
         GroupSet: [Ref(:SecurityGroup)]
       }
@@ -119,8 +178,8 @@ CloudFormation do
     wait_handle = [
       "#!/bin/bash\n",
       'export wait_handle="', Ref(:WaitHandle), "\"\n",
-      'export vpc_id="', Ref(:VPCID), "\"\n",
-      'export subnet_id="', Ref(:SubnetId), "\"\n",
+      'export vpc_id="', Ref(:VPC), "\"\n",
+      'export subnet_id="', Ref(:Subnet), "\"\n",
       'export world_cidr="', Ref(:WorldCIDR), "\"\n"
     ]
 

@@ -6,16 +6,14 @@ require 'cfndsl'
 region = ENV['AWS_REGION'] unless ENV['AWS_REGION'].nil?
 region = 'us-east-1' if ENV['AWS_REGION'].nil?
 @cloudformation = Aws::CloudFormation::Client.new(region: region)
-@stack_name = "AWS-DEVSECOPS-WORKSHOP-JENKINS-#{ENV['USER'].upcase}"
+@stack_name = "AWS-DEVSECOPS-WORKSHOP-JENKINS-#{ENV['USER'].upcase}6"
 
 namespace :jenkins do
-  desc 'Create a Workshop Jenkins'
-  task :create, [:vpc_id, :subnet_id, :world_cidr] do |_, opts|
+  desc 'Create a Workshop VPC + Jenkins'
+  # task :create, [:vpc_id, :subnet_id, :world_cidr] do |_, opts|
+  task :create, [:world_cidr] do |_, opts|
     opts[:world_cidr] = '0.0.0.0/0'
 
-    # Verify user input
-    abort 'You must specify a VPC.' if opts[:vpc_id].nil?
-    abort 'You must specify a Subnet.' if opts[:subnet_id].nil?
     world_cidr = opts[:world_cidr]
     world_cidr = '0.0.0.0/0' if world_cidr.nil?
 
@@ -25,20 +23,13 @@ namespace :jenkins do
 
     # Create stack
     begin
-      puts 'Creating Jenkins with CloudFormation (3-5 minutes)...'
+      puts 'Creating VPC + Jenkins with CloudFormation (~10 minutes)...'
       @cloudformation.create_stack(
         stack_name: @stack_name,
         template_body: cfn_template,
         capabilities: ['CAPABILITY_IAM'],
+        disable_rollback: true,
         parameters: [
-          {
-            parameter_key: 'VPCID',
-            parameter_value: opts[:vpc_id]
-          },
-          {
-            parameter_key: 'SubnetId',
-            parameter_value: opts[:subnet_id]
-          },
           {
             parameter_key: 'WorldCIDR',
             parameter_value: world_cidr

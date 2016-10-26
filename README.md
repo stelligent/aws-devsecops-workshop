@@ -6,16 +6,23 @@ This repository contains some scripts to stand up a Jenkins in AWS pre-configure
 
 **Note** You must run the following scripts from an environment configured with AWS API Credentials or an instance with an IAM role attached with permission to access CloudFormation and EC2.
 
-### Create the Jenkins
+### Create Workshop Environment
+This script uses cloudformation to provision a VPC and a Jenkins server.
+
 ```bash
 $ bundle install
-$ rake jenkins:create['YOUR-VPC-ID','YOUR-SUBNET-ID','YOUR-CIDR-BLOCK']
-# rake jenkins:create['vpc-aad5159f','subnet-e82cd2b5','68.0.0.0/8']
+$ rake jenkins:create
 ```
 
-*Only include a CIDR block if you're running behind a Proxy, TIC or NAT Gateway.*
+You can include a parameter to specify your VPN CIDR block for a more secure NACL/Security Group configuration:
 
-### Teardown the Jenkins
+Limits inbound/outbound traffic to the VPC, Github and your CIDR block.
+```bash
+$ bundle install
+$ rake jenkins:create['192.0.0.0/24']
+```
+
+### Teardown the Workshop Environment
 ```bash
 $ rake jenkins:teardown
 ```
