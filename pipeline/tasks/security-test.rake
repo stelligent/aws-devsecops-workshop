@@ -28,11 +28,13 @@ namespace :acceptance do
   task security_test: [:'acceptance:inspector']
 
   task :inspector do
-    # system 'git', 'clone', 'https://github.com/stelligent/inspector-status'
-    # # Dir.chdir('inspector-status') do
-    # #   system 'bundle', 'install'
-    # #   system ''
-    # # end
+    system 'git', 'clone', 'https://github.com/stelligent/inspector-status'
+    Dir.chdir('inspector-status') do
+      system 'bundle', 'install'
+      system './inspector.rb', '--target-tags', 'InspectorAuditable:true',
+             '--aws-name-prefix', 'AWS-DEVSECOPS-WORKSHOP',
+             '--rules-to-run', 'SEC,COM,RUN,CIS'
+    end
   end
 end
 

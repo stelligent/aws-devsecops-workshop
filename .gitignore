@@ -1,3 +1,4 @@
 *.template
 *.json
 *.pem
+inspector-status*

@@ -11,6 +11,11 @@ describe 'Server Setup' do
     end
   end
 
+  # Verify the AWS Agent is running
+  describe command('/opt/aws/awsagent/bin/awsagent status') do
+    its(:exit_status) { should eq 0 }
+  end
+
   # Verify the CloudFormation wait json file was created
   describe file('/tmp/cfn-success') do
     it { should exist }

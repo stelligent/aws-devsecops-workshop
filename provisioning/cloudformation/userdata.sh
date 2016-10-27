@@ -4,12 +4,20 @@ set -e
 # Grab security updates
 yum update -y
 
+# Configure working directories
+mkdir -p /opt/nginx /opt/awsagent
+
+# Install AWS Agent (Inspector)
+pushd /opt/awsagent
+  wget https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install
+  curl -O https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install
+  bash install -u false
+  /etc/init.d/awsagent start
+popd
+
 # Install nginx dependencies
 yum install -y pcre-devel zlib-devel openssl-devel
 yum install -y gcc make
-
-# Configure working directory
-mkdir -p /opt/nginx
 
 # Download nginx
 pushd /opt/nginx
