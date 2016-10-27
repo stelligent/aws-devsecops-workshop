@@ -51,7 +51,6 @@ CloudFormation do
   end
 
   EC2_SecurityGroup(:ApplicationSecurityGroup) do
-    Condition :IsProduction
     VpcId Ref(:VPCID)
     GroupDescription 'HTTP access for deployment.'
     SecurityGroupIngress [
