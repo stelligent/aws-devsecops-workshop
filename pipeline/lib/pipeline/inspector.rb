@@ -36,7 +36,8 @@ module Pipeline
 
     def configure_inspector_role
       @inspector.register_cross_account_access_role(
-        role_arn: inspector_role_arn)
+        role_arn: inspector_role_arn
+      )
     end
 
     def inspector_role_arn

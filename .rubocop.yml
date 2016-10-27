@@ -1,12 +1,15 @@
 # CloudFormation DSL
 BlockLength:
-  Max: 250
+  Max: 500
 
 ClassLength:
   Max: 150
 
 MethodLength:
   Max: 30
+
+AbcSize:
+  Enabled: false
 
 NumericLiteralPrefix:
   Enabled: false

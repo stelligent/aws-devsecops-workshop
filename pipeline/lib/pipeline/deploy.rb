@@ -60,8 +60,6 @@ module Pipeline
       }
     end
 
-    # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Metrics/MethodLength
     def wait_and_save(waiter)
       retries ||= 5
       started_at = Time.now
