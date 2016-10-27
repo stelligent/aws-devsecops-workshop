@@ -45,6 +45,11 @@ CloudFormation do
     Type 'String'
   end
 
+  Parameter(:JenkinsSG2) do
+    Description 'Jenkins Security group for ssh ingress'
+    Type 'String'
+  end
+
   Parameter(:ConnectorSG) do
     Description 'Jenkins Security group for ingress'
     Type 'String'
@@ -171,7 +176,8 @@ CloudFormation do
           FnIf(:IsProduction,
                Ref(:SecurityGroupProduction),
                Ref(:SecurityGroupAcceptance)),
-          Ref(:ConnectorSG)
+          Ref(:ConnectorSG),
+          Ref(:JenkinsSG2)
         ]
       }
     ]

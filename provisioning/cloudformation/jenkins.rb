@@ -112,6 +112,13 @@ CloudFormation do
         CidrIp: Ref(:GithubCIDR)
       },
       {
+        # Deployed Environments
+        IpProtocol: 'tcp',
+        FromPort: '22',
+        ToPort: '22',
+        DestinationSecurityGroupId: Ref(:JenkinsSlaves)
+      },
+      {
         # Github
         IpProtocol: 'tcp',
         FromPort: '9418',
@@ -133,6 +140,10 @@ CloudFormation do
         CidrIp: Ref(:WorldCIDR)
       }
     ]
+  end
+
+  EC2_SecurityGroup(:JenkinsSlaves) do
+    VpcId Ref(:VPC)
   end
 
   EC2_SecurityGroup(:ConnectorSecurityGroup) do

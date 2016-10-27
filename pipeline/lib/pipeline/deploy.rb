@@ -109,8 +109,15 @@ module Pipeline
 
     def jenkins_sg
       @cloudformation.describe_stack_resource(
-        stack_name: 'AWS-DEVSECOPS-WORKSHOP-JENKINS2',
+        stack_name: 'AWS-DEVSECOPS-WORKSHOP-JENKINS',
         logical_resource_id: 'SecurityGroup'
+      ).stack_resource_detail.physical_resource_id
+    end
+
+    def jenkins_sg2
+      @cloudformation.describe_stack_resource(
+        stack_name: 'AWS-DEVSECOPS-WORKSHOP-JENKINS',
+        logical_resource_id: 'JenkinsSlaves'
       ).stack_resource_detail.physical_resource_id
     end
 
