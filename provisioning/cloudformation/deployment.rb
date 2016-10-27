@@ -50,10 +50,7 @@ CloudFormation do
     Type 'String'
   end
 
-  Condition :IsProduction, FnEquals(Ref(:Environment), 'production')
-  Condition :IsAcceptance, FnEquals(Ref(:Environment), 'acceptance')
-
-  EC2_SecurityGroup(:SecurityGroupProduction) do
+  EC2_SecurityGroup(:ApplicationSecurityGroup) do
     Condition :IsProduction
     VpcId Ref(:VPCID)
     GroupDescription 'HTTP access for deployment.'
@@ -100,9 +97,8 @@ CloudFormation do
         SubnetId: Ref(:SubnetId),
         DeviceIndex: 0,
         GroupSet: [
-          FnIf(:IsProduction,
-               Ref(:SecurityGroupProduction),
-               Ref(:JenkinsConnectorSG))
+          Ref(:ApplicationSecurityGroup),
+          Ref(:JenkinsConnectorSG)
         ]
       }
     ]
