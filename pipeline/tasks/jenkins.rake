@@ -52,7 +52,9 @@ namespace :jenkins do
     end
 
     jenkins_ip = @cloudformation.describe_stacks(stack_name: @stack_name)
-                                .stacks.first.outputs.first.output_value
+                                .stacks.first.outputs
+                                .select { |o| o.output_key == 'JenkinsIP' }
+                                .first.output_value
 
     puts "---- Jenkins URL: http://#{jenkins_ip}:8080/"
   end

@@ -5,5 +5,8 @@ BlockLength:
 ClassLength:
   Max: 150
 
+MethodLength:
+  Max: 30
+
 NumericLiteralPrefix:
   Enabled: false

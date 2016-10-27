@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'cfn_nag'
+require 'pipeline/inspector'
 
 namespace :commit do
   desc 'Static security tests'
@@ -28,13 +29,7 @@ namespace :acceptance do
   task security_test: [:'acceptance:inspector']
 
   task :inspector do
-    system 'git', 'clone', 'https://github.com/stelligent/inspector-status'
-    Dir.chdir('inspector-status') do
-      system 'bundle', 'install'
-      system './inspector.rb', '--target-tags', 'InspectorAuditable:true',
-             '--aws-name-prefix', 'AWS-DEVSECOPS-WORKSHOP',
-             '--rules-to-run', 'SEC,COM,RUN,CIS'
-    end
+    Pipeline::Inspector.new
   end
 end
 

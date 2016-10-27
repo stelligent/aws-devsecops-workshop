@@ -271,5 +271,42 @@ CloudFormation do
     Roles [Ref(:JenkinsRole)]
   end
 
+  IAM_Role(:InspectorRole) do
+    AssumeRolePolicyDocument(
+      Statement: [{
+        Effect: 'Allow',
+        Principal: {
+          Service: [
+            'inspector.amazonaws.com'
+          ]
+        },
+        Action: [
+          'sts:AssumeRole'
+        ],
+        Condition: {
+          StringEquals: {
+            'sts:ExternalId' => Ref('AWS::AccountId')
+          }
+        }
+      }]
+    )
+
+    Path '/'
+
+    Policies [{
+      PolicyName: 'aws-devsecops-inspector-role',
+      PolicyDocument: {
+        Statement: [
+          {
+            Effect: 'Allow',
+            Action: 'ec2:DescribeInstances',
+            Resource: '*'
+          }
+        ]
+      }
+    }]
+  end
+
   Output(:JenkinsIP, FnGetAtt(:JenkinsServer, 'PublicIp'))
+  Output(:InspectorRoleArn, FnGetAtt(:InspectorRole, 'Arn'))
 end
