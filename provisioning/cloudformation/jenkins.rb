@@ -151,7 +151,7 @@ CloudFormation do
         IpProtocol: 'tcp',
         FromPort: '80',
         ToPort: '80',
-        SourceSecurityGroupId: Ref(:JenkinsConnectorSG)
+        SourceSecurityGroupId: Ref(:JenkinsSecurityGroup)
       }
     ]
     SecurityGroupEgress [
