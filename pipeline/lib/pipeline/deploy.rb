@@ -90,6 +90,9 @@ module Pipeline
                             key: 'WEBSERVER_IP',
                             value: public_ip)
       Pipeline::State.store(namespace: @params[:environment],
+                            key: 'WEBSERVER_PRIVATE_IP',
+                            value: private_ip)
+      Pipeline::State.store(namespace: @params[:environment],
                             key: 'KEYPAIR_NAME',
                             value: stack_name)
       Pipeline::State.store(namespace: @params[:environment],
@@ -103,6 +106,15 @@ module Pipeline
 
       stack.outputs.each do |output|
         return output.output_value if output.output_key == 'EC2PublicIP'
+      end
+    end
+
+    def private_ip
+      stack = @cloudformation.describe_stacks(stack_name: stack_name)
+                             .stacks.first
+
+      stack.outputs.each do |output|
+        return output.output_value if output.output_key == 'EC2PrivateIP'
       end
     end
 

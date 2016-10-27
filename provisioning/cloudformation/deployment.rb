@@ -133,4 +133,5 @@ CloudFormation do
   end
 
   Output(:EC2PublicIP, FnGetAtt(:WebServer, 'PublicIp'))
+  Output(:EC2PrivateIP, FnGetAtt(:WebServer, 'PrivateIp'))
 end

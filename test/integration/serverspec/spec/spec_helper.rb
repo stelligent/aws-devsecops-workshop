@@ -6,7 +6,7 @@ require 'serverspec'
 require 'net/ssh'
 require 'pipeline/state'
 
-target_host = Pipeline::State.retrieve('acceptance', 'WEBSERVER_IP')
+target_host = Pipeline::State.retrieve('acceptance', 'WEBSERVER_PRIVATE_IP')
 keypair_path = Pipeline::State.retrieve('acceptance', 'KEYPAIR_PATH')
 
 set :backend, :ssh
