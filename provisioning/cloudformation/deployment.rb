@@ -40,8 +40,8 @@ CloudFormation do
     AllowedValues %w(acceptance production)
   end
 
-  Parameter(:JenkinsCIDR) do
-    Description 'CIDR block for jenkins to access web server.'
+  Parameter(:JenkinsSG) do
+    Description 'Jenkins Security group for webserver ingress'
     Type 'String'
   end
 
@@ -62,13 +62,13 @@ CloudFormation do
         IpProtocol: 'tcp',
         FromPort: '80',
         ToPort: '80',
-        CidrIp: Ref(:JenkinsCIDR)
+        SourceSecurityGroupId: Ref(:JenkinsSG)
       },
       {
         IpProtocol: 'tcp',
         FromPort: '22',
         ToPort: '22',
-        CidrIp: Ref(:JenkinsCIDR)
+        SourceSecurityGroupId: Ref(:JenkinsSG)
       }
     ]
     SecurityGroupEgress [
@@ -88,7 +88,7 @@ CloudFormation do
         IpProtocol: 'tcp',
         FromPort: '22',
         ToPort: '22',
-        CidrIp: Ref(:JenkinsCIDR)
+        DestinationSecurityGroupId: Ref(:JenkinsSG)
       }
     ]
   end
@@ -159,6 +159,10 @@ CloudFormation do
         # Avoids 'No Updates to be performed' error
         Key: 'UUID',
         Value: `uuidgen`
+      },
+      {
+        Key: 'InspectorAuditable',
+        Value: 'true'
       }
     ]
 

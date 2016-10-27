@@ -48,7 +48,7 @@ module Pipeline
         parameter('SubnetId', ENV['SubnetId']),
         parameter('KeyPairName', keypair),
         parameter('Environment', @params[:environment]),
-        parameter('JenkinsCIDR', jenkins_cidr),
+        parameter('JenkinsSG', jenkins_sg),
         parameter('WorldCIDR', ENV['WorldCIDR'])
       ]
     end
@@ -107,7 +107,10 @@ module Pipeline
     end
 
     def jenkins_cidr
-      "#{eat('http://ipecho.net/plain')}/32"
+      @cloudformation.describe_stack_resource(
+        stack_name: 'AWS-DEVSECOPS-WORKSHOP-JENKINS',
+        logical_resource_id: 'SecurityGroup'
+      ).stack_resource_detail.physical_resource_id
     end
 
     def keypair

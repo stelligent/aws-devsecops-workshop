@@ -94,13 +94,6 @@ CloudFormation do
         FromPort: '8080',
         ToPort: '8080',
         CidrIp: Ref(:WorldCIDR)
-      },
-      {
-        # DEBUGGING SSH
-        IpProtocol: 'tcp',
-        FromPort: '22',
-        ToPort: '22',
-        CidrIp: Ref(:WorldCIDR)
       }
     ]
     SecurityGroupEgress [
@@ -110,6 +103,13 @@ CloudFormation do
         FromPort: '8080',
         ToPort: '8080',
         CidrIp: Ref(:WorldCIDR)
+      },
+      {
+        # VPC SSH
+        IpProtocol: 'tcp',
+        FromPort: '22',
+        ToPort: '22',
+        CidrIp: '11.0.0.0/16'
       },
       {
         # Github
@@ -155,7 +155,6 @@ CloudFormation do
     ImageId 'ami-32114e25'
     InstanceType Ref(:InstanceType)
     IamInstanceProfile Ref(:JenkinsInstanceProfile)
-    KeyName 'rmurphy-goldbase'
     NetworkInterfaces [
       {
         AssociatePublicIpAddress: true,
@@ -218,6 +217,11 @@ CloudFormation do
           {
             Effect: 'Allow',
             Action: 'ec2:*',
+            Resource: '*'
+          },
+          {
+            Effect: 'Allow',
+            Action: 'inspector:*',
             Resource: '*'
           }
         ]
