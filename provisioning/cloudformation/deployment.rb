@@ -40,17 +40,7 @@ CloudFormation do
     AllowedValues %w(acceptance production)
   end
 
-  Parameter(:JenkinsSG) do
-    Description 'Jenkins Security group for ingress'
-    Type 'String'
-  end
-
-  Parameter(:JenkinsSG2) do
-    Description 'Jenkins Security group for ssh ingress'
-    Type 'String'
-  end
-
-  Parameter(:ConnectorSG) do
+  Parameter(:JenkinsConnectorSG) do
     Description 'Jenkins Security group for ingress'
     Type 'String'
   end
@@ -62,69 +52,6 @@ CloudFormation do
 
   Condition :IsProduction, FnEquals(Ref(:Environment), 'production')
   Condition :IsAcceptance, FnEquals(Ref(:Environment), 'acceptance')
-
-  EC2_SecurityGroup(:SecurityGroupAcceptance) do
-    Condition :IsAcceptance
-    VpcId Ref(:VPCID)
-    GroupDescription 'SSH and HTTP access for acceptance testing.'
-    SecurityGroupIngress [
-      {
-        IpProtocol: 'tcp',
-        FromPort: '80',
-        ToPort: '80',
-        CidrIp: Ref(:WorldCIDR)
-      },
-      {
-        # Jenkins HTTP
-        IpProtocol: 'tcp',
-        FromPort: '80',
-        ToPort: '80',
-        SourceSecurityGroupId: Ref(:JenkinsSG)
-      },
-      {
-        # Jenkins SSH
-        IpProtocol: 'tcp',
-        FromPort: '22',
-        ToPort: '22',
-        SourceSecurityGroupId: Ref(:JenkinsSG)
-      }
-    ]
-    SecurityGroupEgress [
-      {
-        IpProtocol: 'tcp',
-        FromPort: '80',
-        ToPort: '80',
-        CidrIp: Ref(:WorldCIDR)
-      },
-      {
-        IpProtocol: 'tcp',
-        FromPort: '443',
-        ToPort: '443',
-        CidrIp: Ref(:WorldCIDR)
-      },
-      {
-        # Jenkins SSH
-        IpProtocol: 'tcp',
-        FromPort: '22',
-        ToPort: '22',
-        DestinationSecurityGroupId: Ref(:JenkinsSG)
-      },
-      {
-        # Jenkins HTTP
-        IpProtocol: 'tcp',
-        FromPort: '80',
-        ToPort: '80',
-        DestinationSecurityGroupId: Ref(:JenkinsSG)
-      },
-      {
-        # Jenkins HTTPS
-        IpProtocol: 'tcp',
-        FromPort: '443',
-        ToPort: '443',
-        DestinationSecurityGroupId: Ref(:JenkinsSG)
-      }
-    ]
-  end
 
   EC2_SecurityGroup(:SecurityGroupProduction) do
     Condition :IsProduction
@@ -175,9 +102,7 @@ CloudFormation do
         GroupSet: [
           FnIf(:IsProduction,
                Ref(:SecurityGroupProduction),
-               Ref(:SecurityGroupAcceptance)),
-          Ref(:ConnectorSG),
-          Ref(:JenkinsSG2)
+               Ref(:JenkinsConnectorSG))
         ]
       }
     ]

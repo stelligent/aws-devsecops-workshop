@@ -84,9 +84,9 @@ CloudFormation do
     RouteTableId Ref(:RouteTable)
   end
 
-  EC2_SecurityGroup(:SecurityGroup) do
+  EC2_SecurityGroup(:JenkinsSecurityGroup) do
     VpcId Ref(:VPC)
-    GroupDescription 'Jenkins Security Group'
+    GroupDescription 'AWS DevSecOps Workshop Jenkins'
     SecurityGroupIngress [
       {
         # Jenkins HTTP
@@ -98,10 +98,24 @@ CloudFormation do
     ]
     SecurityGroupEgress [
       {
-        # Jenkins HTTP
+        # Deployed Environments
         IpProtocol: 'tcp',
-        FromPort: '8080',
-        ToPort: '8080',
+        FromPort: '22',
+        ToPort: '22',
+        CidrIp: '11.0.0.0/20'
+      },
+      {
+        # Internet
+        IpProtocol: 'tcp',
+        FromPort: '80',
+        ToPort: '80',
+        CidrIp: Ref(:WorldCIDR)
+      },
+      {
+        # Internet
+        IpProtocol: 'tcp',
+        FromPort: '443',
+        ToPort: '443',
         CidrIp: Ref(:WorldCIDR)
       },
       {
@@ -110,13 +124,6 @@ CloudFormation do
         FromPort: '22',
         ToPort: '22',
         CidrIp: Ref(:GithubCIDR)
-      },
-      {
-        # Deployed Environments
-        IpProtocol: 'tcp',
-        FromPort: '22',
-        ToPort: '22',
-        DestinationSecurityGroupId: Ref(:JenkinsSlaves)
       },
       {
         # Github
@@ -124,75 +131,50 @@ CloudFormation do
         FromPort: '9418',
         ToPort: '9418',
         CidrIp: Ref(:GithubCIDR)
-      },
-      {
-        # World HTTP
-        IpProtocol: 'tcp',
-        FromPort: '80',
-        ToPort: '80',
-        CidrIp: Ref(:WorldCIDR)
-      },
-      {
-        # World HTTPS
-        IpProtocol: 'tcp',
-        FromPort: '443',
-        ToPort: '443',
-        CidrIp: Ref(:WorldCIDR)
       }
     ]
   end
 
-  EC2_SecurityGroup(:JenkinsSlaves) do
+  EC2_SecurityGroup(:JenkinsConnector) do
+    GroupDescription 'AWS DevSecOps Workshop Jenkins Connector'
     VpcId Ref(:VPC)
-  end
-
-  EC2_SecurityGroup(:ConnectorSecurityGroup) do
-    VpcId Ref(:VPC)
-    GroupDescription 'AWS DevSecOps Workshop Connector'
     SecurityGroupIngress [
       {
-        # VPC SSH
+        # Deployed Environments
         IpProtocol: 'tcp',
         FromPort: '22',
         ToPort: '22',
-        SourceSecurityGroupId: Ref(:SecurityGroup)
+        SourceSecurityGroupId: Ref(:JenkinsSecurityGroup)
       },
       {
-        # VPC HTTP
+        # Deployed Environments
         IpProtocol: 'tcp',
         FromPort: '80',
         ToPort: '80',
-        SourceSecurityGroupId: Ref(:SecurityGroup)
-      },
-      {
-        # VPC HTTPS
-        IpProtocol: 'tcp',
-        FromPort: '443',
-        ToPort: '443',
-        SourceSecurityGroupId: Ref(:SecurityGroup)
+        SourceSecurityGroupId: Ref(:JenkinsConnectorSG)
       }
     ]
     SecurityGroupEgress [
       {
-        # VPC SSH
+        # Deployed Environments
         IpProtocol: 'tcp',
         FromPort: '22',
         ToPort: '22',
-        DestinationSecurityGroupId: Ref(:SecurityGroup)
+        DestinationSecurityGroupId: Ref(:JenkinsSecurityGroup)
       },
       {
-        # VPC HTTP
+        # Deployed Environments
         IpProtocol: 'tcp',
         FromPort: '80',
         ToPort: '80',
-        DestinationSecurityGroupId: Ref(:SecurityGroup)
+        DestinationSecurityGroupId: Ref(:JenkinsSecurityGroup)
       },
       {
-        # VPC HTTPS
+        # Deployed Environments
         IpProtocol: 'tcp',
         FromPort: '443',
         ToPort: '443',
-        DestinationSecurityGroupId: Ref(:SecurityGroup)
+        DestinationSecurityGroupId: Ref(:JenkinsSecurityGroup)
       }
     ]
   end
@@ -216,7 +198,7 @@ CloudFormation do
         DeleteOnTermination: true,
         SubnetId: Ref(:Subnet),
         DeviceIndex: 0,
-        GroupSet: [Ref(:SecurityGroup), Ref(:ConnectorSecurityGroup)]
+        GroupSet: [Ref(:JenkinsSecurityGroup)]
       }
     ]
     Tags [
