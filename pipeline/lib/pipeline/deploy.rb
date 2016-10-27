@@ -106,7 +106,7 @@ module Pipeline
       end
     end
 
-    def jenkins_cidr
+    def jenkins_sg
       @cloudformation.describe_stack_resource(
         stack_name: 'AWS-DEVSECOPS-WORKSHOP-JENKINS',
         logical_resource_id: 'SecurityGroup'
