@@ -41,7 +41,12 @@ CloudFormation do
   end
 
   Parameter(:JenkinsSG) do
-    Description 'Jenkins Security group for webserver ingress'
+    Description 'Jenkins Security group for ingress'
+    Type 'String'
+  end
+
+  Parameter(:ConnectorSG) do
+    Description 'Jenkins Security group for ingress'
     Type 'String'
   end
 
@@ -62,9 +67,17 @@ CloudFormation do
         IpProtocol: 'tcp',
         FromPort: '80',
         ToPort: '80',
+        CidrIp: Ref(:WorldCIDR)
+      },
+      {
+        # Jenkins HTTP
+        IpProtocol: 'tcp',
+        FromPort: '80',
+        ToPort: '80',
         SourceSecurityGroupId: Ref(:JenkinsSG)
       },
       {
+        # Jenkins SSH
         IpProtocol: 'tcp',
         FromPort: '22',
         ToPort: '22',
@@ -85,9 +98,24 @@ CloudFormation do
         CidrIp: Ref(:WorldCIDR)
       },
       {
+        # Jenkins SSH
         IpProtocol: 'tcp',
         FromPort: '22',
         ToPort: '22',
+        DestinationSecurityGroupId: Ref(:JenkinsSG)
+      },
+      {
+        # Jenkins HTTP
+        IpProtocol: 'tcp',
+        FromPort: '80',
+        ToPort: '80',
+        DestinationSecurityGroupId: Ref(:JenkinsSG)
+      },
+      {
+        # Jenkins HTTPS
+        IpProtocol: 'tcp',
+        FromPort: '443',
+        ToPort: '443',
         DestinationSecurityGroupId: Ref(:JenkinsSG)
       }
     ]
@@ -142,7 +170,8 @@ CloudFormation do
         GroupSet: [
           FnIf(:IsProduction,
                Ref(:SecurityGroupProduction),
-               Ref(:SecurityGroupAcceptance))
+               Ref(:SecurityGroupAcceptance)),
+          Ref(:ConnectorSG)
         ]
       }
     ]

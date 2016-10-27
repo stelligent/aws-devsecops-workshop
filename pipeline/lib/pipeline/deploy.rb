@@ -49,6 +49,7 @@ module Pipeline
         parameter('KeyPairName', keypair),
         parameter('Environment', @params[:environment]),
         parameter('JenkinsSG', jenkins_sg),
+        parameter('ConnectorSG', connector_sg),
         parameter('WorldCIDR', ENV['WorldCIDR'])
       ]
     end
@@ -108,8 +109,15 @@ module Pipeline
 
     def jenkins_sg
       @cloudformation.describe_stack_resource(
-        stack_name: 'AWS-DEVSECOPS-WORKSHOP-JENKINS',
+        stack_name: 'AWS-DEVSECOPS-WORKSHOP-JENKINS2',
         logical_resource_id: 'SecurityGroup'
+      ).stack_resource_detail.physical_resource_id
+    end
+
+    def connector_sg
+      @cloudformation.describe_stack_resource(
+        stack_name: 'AWS-DEVSECOPS-WORKSHOP-JENKINS2',
+        logical_resource_id: 'ConnectorSecurityGroup'
       ).stack_resource_detail.physical_resource_id
     end
 

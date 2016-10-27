@@ -86,7 +86,7 @@ CloudFormation do
 
   EC2_SecurityGroup(:SecurityGroup) do
     VpcId Ref(:VPC)
-    GroupDescription 'HTTP access for deployment.'
+    GroupDescription 'Jenkins Security Group'
     SecurityGroupIngress [
       {
         # Jenkins HTTP
@@ -103,13 +103,6 @@ CloudFormation do
         FromPort: '8080',
         ToPort: '8080',
         CidrIp: Ref(:WorldCIDR)
-      },
-      {
-        # VPC SSH
-        IpProtocol: 'tcp',
-        FromPort: '22',
-        ToPort: '22',
-        CidrIp: '11.0.0.0/16'
       },
       {
         # Github
@@ -142,6 +135,57 @@ CloudFormation do
     ]
   end
 
+  EC2_SecurityGroup(:ConnectorSecurityGroup) do
+    VpcId Ref(:VPC)
+    GroupDescription 'AWS DevSecOps Workshop Connector'
+    SecurityGroupIngress [
+      {
+        # VPC SSH
+        IpProtocol: 'tcp',
+        FromPort: '22',
+        ToPort: '22',
+        SourceSecurityGroupId: Ref(:SecurityGroup)
+      },
+      {
+        # VPC HTTP
+        IpProtocol: 'tcp',
+        FromPort: '80',
+        ToPort: '80',
+        SourceSecurityGroupId: Ref(:SecurityGroup)
+      },
+      {
+        # VPC HTTPS
+        IpProtocol: 'tcp',
+        FromPort: '443',
+        ToPort: '443',
+        SourceSecurityGroupId: Ref(:SecurityGroup)
+      }
+    ]
+    SecurityGroupEgress [
+      {
+        # VPC SSH
+        IpProtocol: 'tcp',
+        FromPort: '22',
+        ToPort: '22',
+        DestinationSecurityGroupId: Ref(:SecurityGroup)
+      },
+      {
+        # VPC HTTP
+        IpProtocol: 'tcp',
+        FromPort: '80',
+        ToPort: '80',
+        DestinationSecurityGroupId: Ref(:SecurityGroup)
+      },
+      {
+        # VPC HTTPS
+        IpProtocol: 'tcp',
+        FromPort: '443',
+        ToPort: '443',
+        DestinationSecurityGroupId: Ref(:SecurityGroup)
+      }
+    ]
+  end
+
   CloudFormation_WaitConditionHandle(:WaitHandle)
 
   CloudFormation_WaitCondition(:EC2Waiter) do
@@ -161,7 +205,7 @@ CloudFormation do
         DeleteOnTermination: true,
         SubnetId: Ref(:Subnet),
         DeviceIndex: 0,
-        GroupSet: [Ref(:SecurityGroup)]
+        GroupSet: [Ref(:SecurityGroup), Ref(:ConnectorSecurityGroup)]
       }
     ]
     Tags [

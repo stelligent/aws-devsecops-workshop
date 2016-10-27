@@ -25,8 +25,14 @@ end
 
 namespace :acceptance do
   desc 'Integration security tests'
-  task :security_test do
-    puts 'Security / Integration testing against environment'
+  task security_test: [:'acceptance:inspector']
+
+  task :inspector do
+    # system 'git', 'clone', 'https://github.com/stelligent/inspector-status'
+    # # Dir.chdir('inspector-status') do
+    # #   system 'bundle', 'install'
+    # #   system ''
+    # # end
   end
 end
 
