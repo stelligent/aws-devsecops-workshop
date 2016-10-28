@@ -51,6 +51,9 @@ module Pipeline
     end
 
     def clone
+      # Ensure a clean slate
+      cleanup_inspector
+
       # Clone the repo
       system 'git', 'clone', 'https://github.com/stelligent/inspector-status'
 
