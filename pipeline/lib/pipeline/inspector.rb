@@ -8,8 +8,8 @@ module Pipeline
   class Inspector
     def initialize(params = {})
       @params = params
-      @params[:region] = ENV['AWS_REGION'] unless ENV['AWS_REGION'].nil?
-      @params[:region] = 'us-east-1' if @params[:region].nil?
+      @params[:region] = ENV['AWS_REGION']
+      @params[:region] ||= 'us-east-1'
       @cloudformation = Aws::CloudFormation::Client
                         .new(region: @params[:region])
       @inspector = Aws::Inspector::Client.new(region: @params[:region])
@@ -41,8 +41,9 @@ module Pipeline
     end
 
     def inspector_role_arn
-      stack = @cloudformation.describe_stacks(stack_name: stack_name)
-                             .stacks.first
+      stack = @cloudformation.describe_stacks(
+        stack_name: 'AWS-DEVSECOPS-WORKSHOP-JENKINS'
+      ).stacks.first
 
       stack.outputs.each do |output|
         return output.output_value if output.output_key == 'InspectorRoleArn'
