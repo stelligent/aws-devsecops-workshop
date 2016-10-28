@@ -73,7 +73,7 @@ module Pipeline
         system './inspector.rb', '--target-tags', 'InspectorAuditable:true',
                '--aws-name-prefix', 'AWS-DEVSECOPS-WORKSHOP',
                '--failure-metrics', 'numeric_severity:9',
-               '--asset-duration', '60',
+               '--asset-duration', 60,
                '--rules-to-run', 'SEC,COM,RUN,CIS'
       end
     rescue RuntimeError => errors
