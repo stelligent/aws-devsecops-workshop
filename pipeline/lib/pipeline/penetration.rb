@@ -7,12 +7,9 @@ require 'pipeline/cfn_helper'
 module Pipeline
   # Class for handling inspector tests
   class Penetration < CloudFormationHelper
-    def initialize(params = {})
-      @params = params
-      @params[:region] = ENV['AWS_REGION']
-      @params[:region] ||= 'us-east-1'
+    def initialize
       @cloudformation = Aws::CloudFormation::Client
-                        .new(region: @params[:region])
+                        .new(region: aws_region)
 
       penetration_test
     end

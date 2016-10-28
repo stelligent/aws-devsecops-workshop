@@ -7,6 +7,11 @@ require 'pipeline/cfn_helper'
 module Pipeline
   # Provides helper methods for provisioning
   class CloudFormationHelper
+    def aws_region
+      return 'us-east-1' if ENV['AWS_REGION'].nil?
+      ENV['AWS_REGION']
+    end
+
     def cfn_parameters(template_name)
       template_path = "provisioning/cloudformation/#{template_name}.template"
       {

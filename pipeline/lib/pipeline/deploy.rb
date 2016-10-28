@@ -9,13 +9,10 @@ require 'pipeline/cfn_helper'
 module Pipeline
   # Deployment class for all environments
   class Deploy < CloudFormationHelper
-    def initialize(params = {})
-      @params = params
-      @params[:region] = ENV['AWS_REGION'] unless ENV['AWS_REGION'].nil?
-      @params[:region] = 'us-east-1' if @params[:region].nil?
+    def initialize
       @cloudformation = Aws::CloudFormation::Client
-                        .new(region: @params[:region])
-      @ec2 = Aws::EC2::Client.new(region: @params[:region])
+                        .new(region: aws_region)
+      @ec2 = Aws::EC2::Client.new(region: aws_region)
 
       deploy
     end
