@@ -30,22 +30,14 @@ node('master') {
           // Create Acceptance Environment
           rake 'acceptance:create_environment'
 
-          try {
-            // Infrastructure Tests
-            rake 'acceptance:infrastructure_test'
+          // Infrastructure Tests
+          rake 'acceptance:infrastructure_test'
 
-            // Integration Tests
-            rake 'acceptance:integration_test'
+          // Integration Tests
+          rake 'acceptance:integration_test'
 
-            // Security / Integration Tests
-            rake 'acceptance:security_test'
-          } catch(err) {
-            // Teardown Acceptance Environment
-            rake 'acceptance:teardown_environment'
-
-            // Bubble up the exception to the pipeline
-            handleException(err)
-          }
+          // Security / Integration Tests
+          rake 'acceptance:security_test'
         }
       }
 
