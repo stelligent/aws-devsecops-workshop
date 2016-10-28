@@ -33,7 +33,7 @@ module Pipeline
         end
       end
 
-      sleep 180 if waiter == :stack_create_complete
+      sleep 180 if waiter_name == :stack_create_complete
     end
 
     def keypair
