@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-# /pen-test-app.py --zap-host 192.168.1.5:8080 --target http://192.168.1.73:5000
-
 require 'aws-sdk'
 require 'pipeline/cfn_helper'
 
@@ -22,6 +20,10 @@ module Pipeline
     def penetration_test
       run_penetration_test
       results
+    end
+
+    def results
+      puts File.read('results.json')
     end
 
     def run_penetration_test
