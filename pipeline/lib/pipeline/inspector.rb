@@ -63,7 +63,7 @@ module Pipeline
 
     def run_inspector
       # This is required for inspector -- weird
-      ENV['AWS_REGION'] = aws_region
+      ENV['AWS_REGION'] ||= 'us-east-1'
 
       Dir.chdir('inspector-status') do
         system 'bundle', 'install'
