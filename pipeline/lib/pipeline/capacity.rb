@@ -7,7 +7,7 @@ require 'pipeline/cfn_helper'
 # Pipeline
 module Pipeline
   # Class for handling inspector tests
-  class Penetration < CloudFormationHelper
+  class Capacity < CloudFormationHelper
     def initialize
       @cloudformation = Aws::CloudFormation::Client
                         .new(region: aws_region)
