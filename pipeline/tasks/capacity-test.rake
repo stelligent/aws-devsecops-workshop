@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 
+require 'pipeline/capacity'
+
 namespace :capacity do
   desc 'Capacity test acceptance environment'
   task :capacity_test do
-    puts 'Capacity testing the environment'
+    Pipeline::Capacity.new
   end
 end
