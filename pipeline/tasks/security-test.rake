@@ -2,6 +2,7 @@
 
 require 'cfn_nag'
 require 'pipeline/inspector'
+require 'pipeline/penetration'
 
 namespace :commit do
   desc 'Static security tests'
