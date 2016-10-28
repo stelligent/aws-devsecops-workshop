@@ -94,6 +94,7 @@ DEPENDENCIES
   cucumber
   eat
   english
+  rspec
   rubocop
   serverspec
 

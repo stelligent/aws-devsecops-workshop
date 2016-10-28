@@ -11,6 +11,9 @@ pushd /opt/ZAP
   popd
 popd
 
+# Install apache benchmark - Easy Capacity Testing
+apt-get install -y apache2-utils
+
 # Update Jenkins with some build parameters
 sed -i.bak "s#VPCID_TOKEN#${vpc_id}#g" /var/lib/jenkins/config.xml
 sed -i.bak "s#SUBNETID_TOKEN#${subnet_id}#g" /var/lib/jenkins/config.xml
