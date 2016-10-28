@@ -62,6 +62,9 @@ module Pipeline
     end
 
     def run_inspector
+      # This is required for inspector -- weird
+      ENV['AWS_REGION'] = aws_region
+
       Dir.chdir('inspector-status') do
         system 'bundle', 'install'
         system './inspector.rb', '--target-tags', 'InspectorAuditable:true',
