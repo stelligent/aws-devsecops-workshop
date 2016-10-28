@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'aws-sdk'
+require 'json'
 require 'pipeline/cfn_helper'
 
 # Pipeline
@@ -20,13 +21,21 @@ module Pipeline
     end
 
     def results
-      puts File.read('results.json')
+      result_output = JSON.parse(File.read('results.json'))
+
+      result_output.each do |issue|
+        puts "#{issue['risk']}: #{issue['alert']}"
+        puts "Description: #{issue['description']}"
+        puts "Solution: #{issue['solution']}"
+        puts '---'
+      end
     end
 
     def run_penetration_test
       system '/var/lib/jenkins/pen-test-app.py',
              '--zap-host', 'localhost:80',
              '--target', "http://#{webserver_ip}"
+      system 'behave'
     end
 
     def webserver_ip
