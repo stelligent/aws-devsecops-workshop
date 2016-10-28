@@ -4,7 +4,7 @@ set -ex
 # Install ZAP - Penetration Test
 mkdir -p /opt/ZAP
 pushd /opt/ZAP
-  wget wget https://github.com/zaproxy/zaproxy/releases/download/2.5.0/ZAP_2.5.0_Linux.tar.gz
+  wget https://github.com/zaproxy/zaproxy/releases/download/2.5.0/ZAP_2.5.0_Linux.tar.gz
   tar xf ZAP_2.5.0_Linux.tar.gz
   pushd ZAP_2.5.0
     nohup ./zap.sh -daemon -port 80 -config api.disablekey=true &
