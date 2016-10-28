@@ -189,7 +189,7 @@ CloudFormation do
 
   EC2_Instance(:JenkinsServer) do
     DependsOn :AttachGateway
-    ImageId 'ami-32114e25'
+    ImageId 'ami-9e376e89'
     InstanceType Ref(:InstanceType)
     IamInstanceProfile Ref(:JenkinsInstanceProfile)
     NetworkInterfaces [
@@ -205,7 +205,7 @@ CloudFormation do
       {
         Key: 'Name',
         Value: FnJoin(' - ', [
-                        'AWS DevSecOps Workshop Jenkins',
+                        'AWS DevSecOps Workshop - Jenkins',
                         ENV['USER'].upcase
                       ])
       }

@@ -5,7 +5,9 @@ require 'pipeline/inspector'
 
 namespace :commit do
   desc 'Static security tests'
-  task security_test: [:'commit:cfn_nag:app', :'commit:cfn_nag:jenkins']
+  task security_test: [:'commit:cfn_nag:app',
+                       :'commit:cfn_nag:jenkins',
+                       :'commit:cfn_nag:penetration']
 
   desc 'Execute CFN NAG tests against application'
   task :'cfn_nag:app' do
@@ -18,6 +20,14 @@ namespace :commit do
   desc 'Execute CFN NAG tests against jenkins'
   task :'cfn_nag:jenkins' do
     template_path = 'provisioning/cloudformation/jenkins.template'
+    failures = CfnNag.new.audit(input_json_path: File.open(template_path),
+                                output_format: 'txt')
+    raise "CFN Nag found #{failures.to_i} issue(s)." if failures > 0
+  end
+
+  desc 'Execute CFN NAG tests against penetration'
+  task :'cfn_nag:penetration' do
+    template_path = 'provisioning/cloudformation/penetration.template'
     failures = CfnNag.new.audit(input_json_path: File.open(template_path),
                                 output_format: 'txt')
     raise "CFN Nag found #{failures.to_i} issue(s)." if failures > 0
@@ -36,6 +46,6 @@ end
 namespace :capacity do
   desc 'Penetration security tests'
   task :security_test do
-    puts 'Security / Penetration testing against application'
+    Pipeline::Penetration.new
   end
 end
