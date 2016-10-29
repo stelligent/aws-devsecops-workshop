@@ -9,8 +9,8 @@ require 'rspec'
 require 'socket'
 require 'timeout'
 
-Given(/^that a server has a public IP address$/) do
-  @target_host = Pipeline::State.retrieve('acceptance', 'WEBSERVER_IP')
+Given(/^that the "([^"]*)" server has a public IP address$/) do |environment|
+  @target_host = Pipeline::State.retrieve(environment, 'WEBSERVER_IP')
   expect(@target_host).to match(/.{4}/)
 end
 
