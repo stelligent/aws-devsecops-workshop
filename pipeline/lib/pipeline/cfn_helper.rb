@@ -42,7 +42,6 @@ module Pipeline
     end
 
     def keypair
-      return '' if @params[:environment] == 'production'
       retrieve_or_generate_keypair
     end
 
