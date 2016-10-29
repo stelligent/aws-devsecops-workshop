@@ -5,6 +5,8 @@ pipelineJob('aws-devsecops-workshop') {
 
   description('An example pipeline showcasing the deployment of an application with a security focused pipeline.')
 
+  concurrentBuild(false)
+
   definition {
     cpsScm {
       scm {
