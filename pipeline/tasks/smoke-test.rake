@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'cucumber/rake/task'
+
 namespace :deployment do
   desc 'Smoke test the production deployment'
   Cucumber::Rake::Task.new(:smoke_test) do |t|
