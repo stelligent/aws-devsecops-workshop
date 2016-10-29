@@ -3,6 +3,7 @@
 require 'aws-sdk'
 require 'json'
 require 'pipeline/cfn_helper'
+require 'pipeline/state'
 
 # Pipeline
 module Pipeline
@@ -30,13 +31,7 @@ module Pipeline
     end
 
     def webserver_ip
-      stack = @cloudformation.describe_stacks(
-        stack_name: 'AWS-DEVSECOPS-WORKSHOP-DEPLOY-ACCEPTANCE'
-      ).stacks.first
-
-      stack.outputs.each do |output|
-        return output.output_value if output.output_key == 'EC2PrivateIP'
-      end
+      Pipeline::State.retrieve('acceptance', 'WEBSERVER_PRIVATE_IP')
     end
   end
 end

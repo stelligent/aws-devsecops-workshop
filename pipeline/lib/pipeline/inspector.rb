@@ -60,7 +60,7 @@ module Pipeline
       # No tags on this project yet :-(
       Dir.chdir('inspector-status') do
         system 'git', 'reset', '--hard',
-               '07985930275be843df6f84b2417af7a2aaa5cc76'
+               '08127dbb57b4f419c1eb77b19a588873949b0ebb'
       end
     end
 
