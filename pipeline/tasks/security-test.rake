@@ -28,10 +28,14 @@ end
 
 namespace :acceptance do
   desc 'Integration security tests'
-  task security_test: [:'acceptance:inspector']
+  task security_test: [:'acceptance:inspector', :'acceptance:config_rules']
 
   task :inspector do
     Pipeline::Inspector.new
+  end
+
+  task :config_rules do
+    puts 'Config Rules Status checks here!'
   end
 end
 
