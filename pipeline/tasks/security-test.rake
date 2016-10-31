@@ -35,7 +35,12 @@ namespace :acceptance do
   end
 
   task :config_rules do
-    puts 'Config Rules Status checks here!'
+    region = ENV['AWS_REGION']
+    region ||= 'us-east-1'
+    Dir.chdir('/opt/config-rule-status') do
+      system 'gulp', 'verify', '--stage',
+             'prod', '--region', region
+    end
   end
 end
 

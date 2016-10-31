@@ -216,7 +216,9 @@ CloudFormation do
       'export wait_handle="', Ref(:WaitHandle), "\"\n",
       'export vpc_id="', Ref(:VPC), "\"\n",
       'export subnet_id="', Ref(:Subnet), "\"\n",
-      'export world_cidr="', Ref(:WorldCIDR), "\"\n"
+      'export region="', Ref('AWS::Region'), "\"\n",
+      'export world_cidr="', Ref(:WorldCIDR), "\"\n",
+      'export config_rules_user="', Ref(:ConfigRulesUser), "\"\n"
     ]
 
     script_path = 'provisioning/cloudformation/jenkins-userdata.sh'
@@ -260,6 +262,11 @@ CloudFormation do
             Effect: 'Allow',
             Action: 'inspector:*',
             Resource: '*'
+          },
+          {
+            Effect: 'Allow',
+            Action: 'iam:CreateAccessKey',
+            Resource: FnGetAtt(:ConfigRulesUser, 'Arn')
           }
         ]
       }
@@ -305,6 +312,36 @@ CloudFormation do
         ]
       }
     }]
+  end
+
+  IAM_Group(:ConfigRulesGroup) do
+    GroupName 'AWS-DEVSECOPS-WORKSHOP'
+    Policies [{
+      PolicyName: 'aws-devsecops-configrules-policy',
+      PolicyDocument: {
+        Statement: [
+          {
+            Effect: 'Allow',
+            Action: 's3:*',
+            Resource: '*'
+          },
+          {
+            Effect: 'Allow',
+            Action: 'cloudformation:*',
+            Resource: '*'
+          },
+          {
+            Effect: 'Allow',
+            Action: 'lambda:*',
+            Resource: '*'
+          }
+        ]
+      }
+    }]
+  end
+
+  IAM_User(:ConfigRulesUser) do
+    Groups [Ref(:ConfigRulesGroup)]
   end
 
   Output(:JenkinsIP, FnGetAtt(:JenkinsServer, 'PublicIp'))
