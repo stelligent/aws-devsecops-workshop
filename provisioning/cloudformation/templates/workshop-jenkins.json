@@ -247,7 +247,7 @@
     "JenkinsServer": {
       "DependsOn": "AttachGateway",
       "Properties": {
-        "ImageId": "ami-9e376e89",
+        "ImageId": "ami-17042300",
         "InstanceType": {
           "Ref": "InstanceType"
         },

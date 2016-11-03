@@ -189,7 +189,7 @@ CloudFormation do
 
   EC2_Instance(:JenkinsServer) do
     DependsOn :AttachGateway
-    ImageId 'ami-9e376e89'
+    ImageId 'ami-17042300'
     InstanceType Ref(:InstanceType)
     IamInstanceProfile Ref(:JenkinsInstanceProfile)
     NetworkInterfaces [
