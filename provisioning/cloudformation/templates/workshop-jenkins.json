@@ -526,7 +526,9 @@
     },
     "ConfigRulesGroup": {
       "Properties": {
-        "GroupName": "AWS-DEVSECOPS-WORKSHOP",
+        "GroupName": {
+          "Ref": "AWS::StackName"
+        },
         "Policies": [
           {
             "PolicyName": "aws-devsecops-configrules-policy",

@@ -316,7 +316,7 @@ CloudFormation do
   end
 
   IAM_Group(:ConfigRulesGroup) do
-    GroupName 'AWS-DEVSECOPS-WORKSHOP'
+    GroupName Ref('AWS::StackName')
     Policies [{
       PolicyName: 'aws-devsecops-configrules-policy',
       PolicyDocument: {
