@@ -41,9 +41,9 @@ node('master') {
           rake 'acceptance:security_test'
 
           // Security / Config Rules Tests
-          sh 'cd /opt/config-rule-status'
-          sh "gulp verify --stage prod --region ${region}"
-          sh 'cd -'
+          dir('/opt/config-rule-status') {
+            sh "gulp verify --stage prod --region ${region}"
+          }
         }
       }
 
