@@ -42,7 +42,7 @@ node('master') {
 
           // Security / Config Rules Tests
           dir('/opt/config-rule-status') {
-            sh "gulp verify --stage prod --region ${region}"
+            sh "echo '{}' | gulp verify --stage prod --region ${region}"
           }
         }
       }

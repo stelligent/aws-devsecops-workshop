@@ -25,6 +25,7 @@ pip install awscli
 
 # Install config-rules-status
 # Go-go gadget Rube Goldberg machine
+chmod 777 /opt
 pushd /opt
   git clone https://github.com/stelligent/config-rule-status.git
   pushd config-rule-status
