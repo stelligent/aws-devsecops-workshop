@@ -7,37 +7,39 @@ Before you get started, there's a couple things you're going to need to prepare.
 ### AWS Account
 We recommend using a new AWS account for the workshop environment. You can also use an existing account, but make sure the account has no existing resources created. Some of the security checks executed by this workshop may discover resources that are not configured to best practices and fail your pipeline.
 
-#### IAM User
-On your new account, create an IAM user with MFA enabled to use to provision your workshop environment.
-
-### Development Environment
-
-#### Ruby 2.2.5
-You're development environment must have ruby 2.2.5 or better to install the dependencies of the scripts used to stand up the workshop environment. [RVM](https://rvm.io/) is a tool that can be used for switching between multiple versions.
-
-#### AWS Credentials
-[Install the aws-cli](http://docs.aws.amazon.com/cli/latest/userguide/installing.html#install-bundle-other-os) and use `aws configure` to set your AWS Access Keys into your development environment.
-
 ## Setup Jenkins
 This repository contains some scripts to stand up a Jenkins in AWS pre-configured to execute this pipeline.
 
-**Note** You must run the following scripts from an environment configured with AWS API Credentials or an instance with an IAM role attached with permission to access CloudFormation and EC2.
-
 ### Create Workshop Environment
-This script uses cloudformation to provision a VPC and a Jenkins server.
+
+One-button launch of the workshop environment:
+
+[![Launch CFN stack](https://s3.amazonaws.com/stelligent-training-public/public/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#cstack=sn~AWS-DEVSECOPS-WORKSHOP-JENKINS|turl~https://s3.amazonaws.com/aws-devsecops-workshop/workshop-jenkins.json)
+
+To launch from the AWS Console, use the following CloudFormation template:
+[`provisioning/cloudformation/templates/workshop-jenkins.json`](https://s3.amazonaws.com/aws-devsecops-workshop/workshop-jenkins.json)
+
+To launch from the CLI, see this example:
+
+```
+aws cloudformation create-stack \
+--stack-name AWS-DEVSECOPS-WORKSHOP-JENKINS  \
+--template-body https://s3.amazonaws.com/aws-devsecops-workshop/workshop-jenkins.json \
+--region us-east-1 \
+--disable-rollback \
+--capabilities="CAPABILITY_NAMED_IAM" \
+--parameters ParameterKey=InstanceType,ParameterValue=t2.micro \
+  ParameterKey=WorldCIDR,ParameterValue=0.0.0.0/0
+```
+
+To launch from your terminal, see this example:
 
 ```bash
 $ bundle install
 $ rake jenkins:create
 ```
 
-You can include a parameter to specify your VPN CIDR block for a more secure NACL/Security Group configuration:
-
-Limits inbound/outbound traffic to the VPC, Github and your CIDR block.
-```bash
-$ bundle install
-$ rake jenkins:create['192.0.0.0/24']
-```
+See `docs/development.md` for more details about the ruby/rake tasks.
 
 ### Jenkins Credentials
 The initial admin user to jenkins is preconfigured, the credentials are below.
@@ -50,21 +52,3 @@ The initial admin user to jenkins is preconfigured, the credentials are below.
 
 #### Github
 You'll need to create a [jenkins credential set](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin) to access private repositories in Jenkins.
-
-## The Pipeline
-This workshop contains a pipeline that will accomplish the following on each commit to it's repository:
-
-* **Commit**
- * Build artifacts
- * Security Tests
-* **Acceptance**
- * Create/deploy acceptance environment
- * Integration Tests
- * Infrastructure Tests
- * Security Tests
-* **Capacity**
- * Capacity Tests
- * Penetration Tests
-* **Deployment**
- * Create/deploy production environment
- * Smoke Tests
