@@ -49,7 +49,7 @@ pushd /opt
     gulp init \
       --region "${region}" \
       --stage prod \
-      --name AWS-DEVSECOPS-WORKSHOP \
+      --name "AWS-DEVSECOPS-WORKSHOP-$(uuidgen | cut -d- -f1)" \
       --awsProfile default \
       --email no-reply@stelligent.com
     gulp build

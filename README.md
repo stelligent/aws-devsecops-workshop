@@ -39,11 +39,6 @@ $ bundle install
 $ rake jenkins:create['192.0.0.0/24']
 ```
 
-### Teardown the Workshop Environment
-```bash
-$ rake jenkins:teardown
-```
-
 ### Jenkins Credentials
 The initial admin user to jenkins is preconfigured, the credentials are below.
 

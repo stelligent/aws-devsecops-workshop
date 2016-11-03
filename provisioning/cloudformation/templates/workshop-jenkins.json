@@ -375,7 +375,7 @@
                 "    gulp init \\\n",
                 "      --region \"${region}\" \\\n",
                 "      --stage prod \\\n",
-                "      --name AWS-DEVSECOPS-WORKSHOP \\\n",
+                "      --name \"AWS-DEVSECOPS-WORKSHOP-$(uuidgen | cut -d- -f1)\" \\\n",
                 "      --awsProfile default \\\n",
                 "      --email no-reply@stelligent.com\n",
                 "    gulp build\n",
