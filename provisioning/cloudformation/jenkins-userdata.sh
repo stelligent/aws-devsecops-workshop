@@ -63,6 +63,8 @@ popd
 # Update Jenkins with some build parameters
 sed -i.bak "s#VPCID_TOKEN#${vpc_id}#g" /var/lib/jenkins/config.xml
 sed -i.bak "s#SUBNETID_TOKEN#${subnet_id}#g" /var/lib/jenkins/config.xml
+sed -i.bak "s#STACK_NAME_TOKEN#${stack_name}#g" /var/lib/jenkins/config.xml
+sed -i.bak "s#REGION_TOKEN#${region}#g" /var/lib/jenkins/config.xml
 sed -i.bak "s#0.0.0.0/0#${world_cidr}#g" /var/lib/jenkins/config.xml
 
 # Restart Jenkins

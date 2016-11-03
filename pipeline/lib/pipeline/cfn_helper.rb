@@ -84,7 +84,7 @@ module Pipeline
 
     def connector_sg
       @cloudformation.describe_stack_resource(
-        stack_name: 'AWS-DEVSECOPS-WORKSHOP-JENKINS',
+        stack_name: ENV['STACK_NAME'],
         logical_resource_id: 'JenkinsConnector'
       ).stack_resource_detail.physical_resource_id
     end

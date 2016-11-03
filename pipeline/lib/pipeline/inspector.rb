@@ -42,7 +42,7 @@ module Pipeline
 
     def inspector_role_arn
       stack = @cloudformation.describe_stacks(
-        stack_name: 'AWS-DEVSECOPS-WORKSHOP-JENKINS'
+        stack_name: ENV['STACK_NAME']
       ).stacks.first
 
       stack.outputs.each do |output|

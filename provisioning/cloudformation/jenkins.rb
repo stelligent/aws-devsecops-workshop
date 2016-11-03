@@ -214,6 +214,7 @@ CloudFormation do
     wait_handle = [
       "#!/bin/bash\n",
       'export wait_handle="', Ref(:WaitHandle), "\"\n",
+      'export stack_name="', Ref('AWS::StackName'), "\"\n",
       'export vpc_id="', Ref(:VPC), "\"\n",
       'export subnet_id="', Ref(:Subnet), "\"\n",
       'export region="', Ref('AWS::Region'), "\"\n",
