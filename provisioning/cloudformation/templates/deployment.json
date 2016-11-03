@@ -1,0 +1,241 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Deployment of the AWS DevSecOps Workshop application.",
+  "Parameters": {
+    "AmazonLinuxAMI": {
+      "Type": "AWS::EC2::Image::Id",
+      "Description": "Amazon Linux AMI to deploy with.",
+      "Default": "ami-c481fad3"
+    },
+    "InstanceType": {
+      "Type": "String",
+      "Description": "EC2 Instance Type to deploy.",
+      "Default": "t2.micro"
+    },
+    "VPCID": {
+      "Type": "AWS::EC2::VPC::Id",
+      "Description": "Amazon VPC ID to deploy infrastructure into."
+    },
+    "SubnetId": {
+      "Type": "AWS::EC2::Subnet::Id",
+      "Description": "Subnet ID to deploy infrastructure into."
+    },
+    "KeyPairName": {
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "Description": "Optional EC2 Keypair to use for the deployed EC2 instance.",
+      "Default": ""
+    },
+    "Environment": {
+      "Type": "String",
+      "Description": "The environment name of this deployment.",
+      "AllowedValues": [
+        "acceptance",
+        "production"
+      ]
+    },
+    "JenkinsConnectorSG": {
+      "Type": "String",
+      "Description": "Jenkins Security group for ingress"
+    },
+    "WorldCIDR": {
+      "Type": "String",
+      "Description": "CIDR block for users to access web server."
+    }
+  },
+  "Resources": {
+    "ApplicationSecurityGroup": {
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCID"
+        },
+        "GroupDescription": "HTTP access for deployment.",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": {
+              "Ref": "WorldCIDR"
+            }
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": {
+              "Ref": "WorldCIDR"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": {
+              "Ref": "WorldCIDR"
+            }
+          }
+        ]
+      },
+      "Type": "AWS::EC2::SecurityGroup"
+    },
+    "WaitHandle": {
+      "Type": "AWS::CloudFormation::WaitConditionHandle"
+    },
+    "EC2Waiter": {
+      "DependsOn": "WebServer",
+      "Properties": {
+        "Handle": {
+          "Ref": "WaitHandle"
+        },
+        "Timeout": "300"
+      },
+      "Type": "AWS::CloudFormation::WaitCondition"
+    },
+    "WebServer": {
+      "Properties": {
+        "ImageId": {
+          "Ref": "AmazonLinuxAMI"
+        },
+        "InstanceType": {
+          "Ref": "InstanceType"
+        },
+        "KeyName": {
+          "Ref": "KeyPairName"
+        },
+        "NetworkInterfaces": [
+          {
+            "AssociatePublicIpAddress": true,
+            "DeleteOnTermination": true,
+            "SubnetId": {
+              "Ref": "SubnetId"
+            },
+            "DeviceIndex": 0,
+            "GroupSet": [
+              {
+                "Ref": "ApplicationSecurityGroup"
+              },
+              {
+                "Ref": "JenkinsConnectorSG"
+              }
+            ]
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                " - ",
+                [
+                  "AWS DevSecOps Workshop",
+                  {
+                    "Ref": "Environment"
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "Key": "Environment",
+            "Value": {
+              "Ref": "Environment"
+            }
+          },
+          {
+            "Key": "UUID",
+            "Value": "A9707C78-DF73-46D7-BC65-F52A6C8B1BE2\n"
+          },
+          {
+            "Key": "InspectorAuditable",
+            "Value": "true"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash\n",
+                "export wait_handle=\"",
+                {
+                  "Ref": "WaitHandle"
+                },
+                "\"\n",
+                "#!/bin/bash\n",
+                "set -e\n",
+                "\n",
+                "# Grab security updates\n",
+                "yum update -y\n",
+                "\n",
+                "# Configure working directories\n",
+                "mkdir -p /opt/nginx /opt/awsagent\n",
+                "\n",
+                "# Install AWS Agent (Inspector)\n",
+                "pushd /opt/awsagent\n",
+                "  wget https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install\n",
+                "  curl -O https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install\n",
+                "  bash install -u false\n",
+                "  /etc/init.d/awsagent start\n",
+                "popd\n",
+                "\n",
+                "# Install nginx dependencies\n",
+                "yum install -y pcre-devel zlib-devel openssl-devel\n",
+                "yum install -y gcc make\n",
+                "\n",
+                "# Download nginx\n",
+                "pushd /opt/nginx\n",
+                "  wget http://nginx.org/download/nginx-1.11.5.tar.gz\n",
+                "  tar xzf nginx-1.11.5.tar.gz\n",
+                "popd\n",
+                "\n",
+                "# Install nginx\n",
+                "pushd /opt/nginx/nginx-1.11.5\n",
+                "  ./configure --sbin-path=/usr/local/sbin --with-http_ssl_module\n",
+                "  make\n",
+                "  make install\n",
+                "popd\n",
+                "\n",
+                "# Start nginx\n",
+                "/usr/local/sbin/nginx\n",
+                "\n",
+                "# Create the CloudFormation wait handle JSON\n",
+                "cat > /tmp/cfn-success <<CFNSUCCESS\n",
+                "{\n",
+                "   \"Status\" : \"SUCCESS\",\n",
+                "   \"Reason\" : \"Configuration Complete\",\n",
+                "   \"UniqueId\" : \"$(uuidgen)\",\n",
+                "   \"Data\" : \"Application has completed configuration.\"\n",
+                "}\n",
+                "CFNSUCCESS\n",
+                "\n",
+                "# Emit success to CloudFormation\n",
+                "curl -T /tmp/cfn-success \"${wait_handle}\"\n"
+              ]
+            ]
+          }
+        }
+      },
+      "Type": "AWS::EC2::Instance"
+    }
+  },
+  "Outputs": {
+    "EC2PublicIP": {
+      "Value": {
+        "Fn::GetAtt": [
+          "WebServer",
+          "PublicIp"
+        ]
+      }
+    },
+    "EC2PrivateIP": {
+      "Value": {
+        "Fn::GetAtt": [
+          "WebServer",
+          "PrivateIp"
+        ]
+      }
+    }
+  }
+}
