@@ -463,6 +463,16 @@
                       "Arn"
                     ]
                   }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "config:*",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "ConfigRulesUser",
+                      "Arn"
+                    ]
+                  }
                 }
               ]
             }

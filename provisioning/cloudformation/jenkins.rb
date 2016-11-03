@@ -268,6 +268,11 @@ CloudFormation do
             Effect: 'Allow',
             Action: 'iam:CreateAccessKey',
             Resource: FnGetAtt(:ConfigRulesUser, 'Arn')
+          },
+          {
+            Effect: 'Allow',
+            Action: 'config:*',
+            Resource: FnGetAtt(:ConfigRulesUser, 'Arn')
           }
         ]
       }
