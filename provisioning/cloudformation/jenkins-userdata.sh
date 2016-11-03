@@ -1,5 +1,7 @@
-#!/bin/bash
+#!/bin/bash --login
 set -ex
+
+export HOME=/root
 
 # Install ZAP - Penetration Test
 mkdir -p /opt/ZAP
@@ -53,7 +55,7 @@ pushd /opt
     gulp deploy:lambda --stage prod --region "${region}"
     gulp deploy:config --stage prod --region "${region}"
   popd
-  chmod -R jenkins:jenkins config-rule-status
+  chown -R jenkins:jenkins config-rule-status
 popd
 
 

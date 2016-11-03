@@ -23,11 +23,11 @@ namespace :jenkins do
 
     # Create stack
     begin
-      puts 'Creating VPC + Jenkins with CloudFormation (~10 minutes)...'
+      puts 'Creating VPC + Jenkins with CloudFormation (~15 minutes)...'
       @cloudformation.create_stack(
         stack_name: @stack_name,
         template_body: cfn_template,
-        capabilities: ['CAPABILITY_IAM'],
+        capabilities: %w(CAPABILITY_IAM CAPABILITY_NAMED_IAM),
         disable_rollback: true,
         parameters: [
           {
@@ -47,7 +47,7 @@ namespace :jenkins do
     @cloudformation.wait_until(waiter, stack_name: @stack_name) do |w|
       w.max_attempts = nil
       w.before_wait do
-        throw :failure if Time.now - started_at > 600
+        throw :failure if Time.now - started_at > 900
       end
     end
 

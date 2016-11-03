@@ -30,10 +30,12 @@ namespace :acceptance do
   desc 'Integration security tests'
   task security_test: [:'acceptance:inspector', :'acceptance:config_rules']
 
+  desc 'Execute AWS Inspector tests'
   task :inspector do
     Pipeline::Inspector.new
   end
 
+  desc 'Execute Config Rules Status tests'
   task :config_rules do
     region = ENV['AWS_REGION']
     region ||= 'us-east-1'

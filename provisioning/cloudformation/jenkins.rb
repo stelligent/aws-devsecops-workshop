@@ -94,6 +94,13 @@ CloudFormation do
         FromPort: '8080',
         ToPort: '8080',
         CidrIp: Ref(:WorldCIDR)
+      },
+      {
+        # Jenkins SSH
+        IpProtocol: 'tcp',
+        FromPort: '22',
+        ToPort: '22',
+        CidrIp: Ref(:WorldCIDR)
       }
     ]
     SecurityGroupEgress [
@@ -190,6 +197,7 @@ CloudFormation do
   EC2_Instance(:JenkinsServer) do
     DependsOn :AttachGateway
     ImageId 'ami-9e376e89'
+    KeyName 'rmurphy-goldbase'
     InstanceType Ref(:InstanceType)
     IamInstanceProfile Ref(:JenkinsInstanceProfile)
     NetworkInterfaces [
@@ -333,6 +341,41 @@ CloudFormation do
           {
             Effect: 'Allow',
             Action: 'lambda:*',
+            Resource: '*'
+          },
+          {
+            Effect: 'Allow',
+            Action: 'iam:*',
+            Resource: '*'
+          },
+          {
+            Effect: 'Allow',
+            Action: 'apigateway:*',
+            Resource: '*'
+          },
+          {
+            Effect: 'Allow',
+            Action: 'kinesis:*',
+            Resource: '*'
+          },
+          {
+            Effect: 'Allow',
+            Action: 'sqs:*',
+            Resource: '*'
+          },
+          {
+            Effect: 'Allow',
+            Action: 'sns:*',
+            Resource: '*'
+          },
+          {
+            Effect: 'Allow',
+            Action: 'config:*',
+            Resource: '*'
+          },
+          {
+            Effect: 'Allow',
+            Action: 'events:*',
             Resource: '*'
           }
         ]
