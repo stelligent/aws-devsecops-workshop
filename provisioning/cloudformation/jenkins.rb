@@ -272,7 +272,7 @@ CloudFormation do
           {
             Effect: 'Allow',
             Action: 'config:*',
-            Resource: FnGetAtt(:ConfigRulesUser, 'Arn')
+            Resource: '*'
           }
         ]
       }
