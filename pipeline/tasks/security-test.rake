@@ -34,17 +34,6 @@ namespace :acceptance do
   task :inspector do
     Pipeline::Inspector.new
   end
-
-  desc 'Execute Config Rules Status tests'
-  task :config_rules do
-    region = ENV['AWS_REGION']
-    region ||= 'us-east-1'
-    Dir.chdir('/opt/config-rule-status') do
-      system 'env'
-      system 'gulp', 'verify', '--stage',
-             'prod', '--region', region
-    end
-  end
 end
 
 namespace :capacity do
