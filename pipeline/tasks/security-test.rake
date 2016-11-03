@@ -28,7 +28,7 @@ end
 
 namespace :acceptance do
   desc 'Integration security tests'
-  task security_test: [:'acceptance:inspector', :'acceptance:config_rules']
+  task security_test: [:'acceptance:inspector']
 
   desc 'Execute AWS Inspector tests'
   task :inspector do
