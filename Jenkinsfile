@@ -26,7 +26,7 @@ node('master') {
       }
 
       stage('Acceptance') {
-        def region = env.AWS_REGION.isEmpty() ? 'us-east-1' : env.AWS_REGION
+        def region = env.AWS_REGION == null ? 'us-east-1' : env.AWS_REGION
         withRvm {
           // Create Acceptance Environment
           rake 'acceptance:create_environment'
