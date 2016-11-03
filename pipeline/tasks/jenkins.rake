@@ -6,7 +6,7 @@ require 'cfndsl'
 region = ENV['AWS_REGION'] unless ENV['AWS_REGION'].nil?
 region = 'us-east-1' if ENV['AWS_REGION'].nil?
 @cloudformation = Aws::CloudFormation::Client.new(region: region)
-@stack_name = "AWS-DEVSECOPS-WORKSHOP-JENKINS-#{`uuidgen | cut -d- -f1`}"
+@stack_name = "AWS-DEVSECOPS-WORKSHOP-JENKINS-#{`uuidgen | cut -d- -f1`.strip!}"
 
 namespace :jenkins do
   desc 'Create a Workshop VPC + Jenkins'
