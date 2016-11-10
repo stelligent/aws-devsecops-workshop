@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'aws-sdk'
-require 'cfndsl'
 
 region = ENV['AWS_REGION'] unless ENV['AWS_REGION'].nil?
 region = 'us-east-1' if ENV['AWS_REGION'].nil?

@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'cfndsl'
-
 namespace :commit do
   desc 'Build application'
   task :build do

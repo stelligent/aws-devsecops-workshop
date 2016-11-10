@@ -12,7 +12,6 @@ GEM
     cfn-nag (0.0.19)
       logging (= 2.0.0)
       trollop (= 2.1.2)
-    cfndsl (0.11.6)
     cucumber (2.4.0)
       builder (>= 2.1.2)
       cucumber-core (~> 1.5.0)
@@ -90,7 +89,6 @@ PLATFORMS
 DEPENDENCIES
   aws-sdk
   cfn-nag
-  cfndsl
   cucumber
   eat
   english
