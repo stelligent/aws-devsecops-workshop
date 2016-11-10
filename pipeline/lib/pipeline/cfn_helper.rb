@@ -13,7 +13,7 @@ module Pipeline
     end
 
     def cfn_parameters(template_name)
-      template_path = "provisioning/cloudformation/#{template_name}.template"
+      template_path = "provisioning/cloudformation/#{template_name}.json"
       {
         stack_name: stack_name,
         template_body: File.read(template_path),
