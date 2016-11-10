@@ -17,8 +17,8 @@ namespace :jenkins do
     world_cidr = '0.0.0.0/0' if world_cidr.nil?
 
     # Compile the template
-    cfn_template_path = 'provisioning/cloudformation/templates/workshop-jenkins.json'
-    cfn_template = File.read(cfn_template_path)
+    cfn_template_path = 'provisioning/cloudformation/templates/workshop-jenkins'
+    cfn_template = File.read("#{cfn_template_path}.json")
 
     # Create stack
     begin
