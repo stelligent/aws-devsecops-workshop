@@ -40,6 +40,10 @@
     "WorldCIDR": {
       "Type": "String",
       "Description": "CIDR block for users to access web server."
+    },
+    "UUID": {
+      "Type": "String",
+      "Description": "Jenkins UUID"
     }
   },
   "Resources": {
@@ -145,7 +149,9 @@
           },
           {
             "Key": "UUID",
-            "Value": "A9707C78-DF73-46D7-BC65-F52A6C8B1BE2\n"
+            "Value": {
+              "Ref": "UUID"
+            }
           },
           {
             "Key": "InspectorAuditable",

@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'aws-sdk'
-require 'cfndsl'
 
 region = ENV['AWS_REGION'] unless ENV['AWS_REGION'].nil?
 region = 'us-east-1' if ENV['AWS_REGION'].nil?
@@ -18,8 +17,8 @@ namespace :jenkins do
     world_cidr = '0.0.0.0/0' if world_cidr.nil?
 
     # Compile the template
-    cfndsl_path = 'provisioning/cloudformation/jenkins.rb'
-    cfn_template = CfnDsl.eval_file_with_extras(cfndsl_path).to_json
+    cfn_template_path = 'provisioning/cloudformation/templates/workshop-jenkins.json'
+    cfn_template = File.read(cfn_template_path)
 
     # Create stack
     begin

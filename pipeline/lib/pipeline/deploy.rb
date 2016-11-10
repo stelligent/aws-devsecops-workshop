@@ -41,6 +41,7 @@ module Pipeline
         parameter('Environment', @params[:environment]),
         parameter('JenkinsConnectorSG', connector_sg),
         parameter('WorldCIDR', ENV['WorldCIDR'])
+        parameter('UUID', `uuidgen`.strip!)
       ]
     end
 
