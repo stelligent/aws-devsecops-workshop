@@ -40,18 +40,9 @@ $ rake jenkins:create['192.0.0.0/24']
 ```
 
 ## Updating CloudFormation Templates
-Templates are generated using CFNDSL.
 
-1. Update the CFNDSL templates
-2. Compile the templates
-3. Upload to S3
-
-Compiling a template:
-```bash
-$ cfndsl provisioning/cloudformation/jenkins.rb \
-  --pretty \
-  > provisioning/cloudformation/templates/workshop-jenkins.json
-```
+1. Update the  the templates
+2. Upload to S3
 
 Uploading to S3:
 ```bash
