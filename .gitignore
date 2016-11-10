@@ -1,5 +1,2 @@
-*.template
-*.json
 *.pem
 inspector-status*
-!provisioning/cloudformation/templates/*.json
