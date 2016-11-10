@@ -6,7 +6,7 @@ require 'pipeline/penetration'
 
 namespace :commit do
   desc 'Static security tests'
-  task security_test: do
+  task :security_test do
     template_path = 'provisioning/cloudformation'
     failures = CfnNag.new.audit(input_json_path: File.open(template_path),
                                 output_format: 'txt')
