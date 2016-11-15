@@ -32,12 +32,17 @@ module Pipeline
       role = @inspector.describe_cross_account_access_role
 
       !role.role_arn.empty? && role.valid
+    rescue NoMethodError
+      false
     end
 
     def configure_inspector_role
       @inspector.register_cross_account_access_role(
         role_arn: inspector_role_arn
       )
+
+      # It takes a moment for validation
+      sleep 30
     end
 
     def inspector_role_arn
