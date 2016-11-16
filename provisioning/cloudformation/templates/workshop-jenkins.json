@@ -32,7 +32,7 @@
         },
         "TimeoutInMinutes": "10"
       },
-      "Type": "AWS::CloudFormation::Stack",
+      "Type": "AWS::CloudFormation::Stack"
     },
     "VPC": {
       "Properties": {
