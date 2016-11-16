@@ -2,6 +2,7 @@ AllCops:
   Exclude:
     - 'inspector-status/**/*'
     - 'features/**/*'
+    - 'pipeline/lib/cfn_nag/**/*'
 
 # CloudFormation DSL
 BlockLength:

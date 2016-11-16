@@ -13,6 +13,7 @@ namespace :commit do
     igw_rules_path = 'lib/json_rules/igw_rules.rb'
     File.write(
       "#{gem_path}/gems/cfn-nag-0.0.19/#{igw_rules_path}",
-      File.read("pipeline/lib/cfn_nag/#{igw_rules_path}"))
+      File.read("pipeline/lib/cfn_nag/#{igw_rules_path}")
+    )
   end
 end
