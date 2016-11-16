@@ -14,6 +14,9 @@ node('master') {
           // Build
           rake 'commit:build'
 
+          // Configure CFN_Nag
+          rake 'commit:cfn_nag:rules'
+
           // Static Analysis
           rake 'commit:static_analysis'
 
