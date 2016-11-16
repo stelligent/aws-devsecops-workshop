@@ -19,6 +19,21 @@
     }
   },
   "Resources": {
+    "InternetGatewayStack": {
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/aws-devsecops-workshop/workshop-igw.template",
+        "Parameters": {
+          "ParentStackName": {
+            "Ref": "AWS::StackName"
+          },
+          "VPC": {
+            "Ref": "VPC"
+          }
+        },
+        "TimeoutInMinutes": "10"
+      },
+      "Type": "AWS::CloudFormation::Stack",
+    },
     "VPC": {
       "Properties": {
         "CidrBlock": "11.0.0.0/16",
@@ -53,30 +68,6 @@
       },
       "Type": "AWS::EC2::Subnet"
     },
-    "InternetGateway": {
-      "Properties": {
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": {
-              "Ref": "AWS::StackName"
-            }
-          }
-        ]
-      },
-      "Type": "AWS::EC2::InternetGateway"
-    },
-    "AttachGateway": {
-      "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        },
-        "InternetGatewayId": {
-          "Ref": "InternetGateway"
-        }
-      },
-      "Type": "AWS::EC2::VPCGatewayAttachment"
-    },
     "RouteTable": {
       "Properties": {
         "VpcId": {
@@ -94,7 +85,7 @@
       "Type": "AWS::EC2::RouteTable"
     },
     "Route": {
-      "DependsOn": "AttachGateway",
+      "DependsOn": "InternetGatewayStack",
       "Properties": {
         "RouteTableId": {
           "Ref": "RouteTable"
@@ -103,7 +94,7 @@
           "Ref": "WorldCIDR"
         },
         "GatewayId": {
-          "Ref": "InternetGateway"
+          "Fn::GetAtt" : [ "InternetGatewayStack", "Outputs.Gateway" ]
         }
       },
       "Type": "AWS::EC2::Route"
@@ -245,7 +236,7 @@
       "Type": "AWS::CloudFormation::WaitCondition"
     },
     "JenkinsServer": {
-      "DependsOn": "AttachGateway",
+      "DependsOn": "InternetGatewayStack",
       "Properties": {
         "ImageId": "ami-17042300",
         "InstanceType": {
