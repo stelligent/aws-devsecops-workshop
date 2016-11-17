@@ -27,4 +27,5 @@
       },
       "Type": "AWS::CloudFormation::Stack"
     }
+  }  
 }
