@@ -14,39 +14,17 @@
   "Resources": {
     "InternetGateway": {
       "Properties": {
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": {
-              "Ref": "ParentStackName"
-            }
+        "TemplateURL": "https://s3.amazonaws.com/aws-devsecops-workshop/workshop-igw.template",
+        "Parameters": {
+          "ParentStackName": {
+            "Ref": "AWS::StackName"
+          },
+          "VPC": {
+            "Ref": "VPC"
           }
-        ]
-      },
-      "Type": "AWS::EC2::InternetGateway"
-    },
-    "AttachGateway": {
-      "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
         },
-        "InternetGatewayId": {
-          "Ref": "InternetGateway"
-        }
+        "TimeoutInMinutes": "10"
       },
-      "Type": "AWS::EC2::VPCGatewayAttachment"
+      "Type": "AWS::CloudFormation::Stack"
     }
-  },
-  "Outputs": {
-    "Gateway": {
-      "Value": {
-        "Ref": "InternetGateway"
-      }
-    },
-    "Attachment": {
-      "Value": {
-        "Ref": "AttachGateway"
-      }
-    }
-  }
 }
