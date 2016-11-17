@@ -1,0 +1,31 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "AWS DevSecOps Workshop Internet Gateway",
+  "Parameters": {
+    "ParentStackName": {
+      "Type": "String",
+      "Description": "The parent stack name."
+    },
+    "VPC": {
+      "Type": "String",
+      "Description": "The VPC ID to attach to"
+    }
+  },
+  "Resources": {
+    "InternetGateway": {
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/aws-devsecops-workshop/workshop-igw.template",
+        "Parameters": {
+          "ParentStackName": {
+            "Ref": "AWS::StackName"
+          },
+          "VPC": {
+            "Ref": "VPC"
+          }
+        },
+        "TimeoutInMinutes": "10"
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    }
+  }  
+}
