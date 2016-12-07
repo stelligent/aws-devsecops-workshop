@@ -44,6 +44,11 @@
     "UUID": {
       "Type": "String",
       "Description": "Jenkins UUID"
+    },
+    "AppVersion": {
+      "Type": "String",
+      "Description": "Version of the application to deploy",
+      "Default": "1.0.1"
     }
   },
   "Resources": {
@@ -172,40 +177,39 @@
                 "#!/bin/bash\n",
                 "set -e\n",
                 "\n",
+
                 "# Grab security updates\n",
                 "yum update -y\n",
                 "\n",
-                "# Configure working directories\n",
-                "mkdir -p /opt/nginx /opt/awsagent\n",
-                "\n",
+
+                "# Disable root ssh\n",
+                "sed -i 's/PermitRootLogin forced-commands-only/PermitRootLogin no/' /etc/ssh/sshd_config \n",
+                "service sshd restart \n",
+
                 "# Install AWS Agent (Inspector)\n",
+                "mkdir -p /opt/awsagent\n",
                 "pushd /opt/awsagent\n",
                 "  wget https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install\n",
-                "  curl -O https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install\n",
                 "  bash install -u false\n",
                 "  /etc/init.d/awsagent start\n",
                 "popd\n",
                 "\n",
-                "# Install nginx dependencies\n",
-                "yum install -y pcre-devel zlib-devel openssl-devel\n",
-                "yum install -y gcc make\n",
+
+                "# Install Node 6\n",
+                "curl --silent --location https://rpm.nodesource.com/setup_6.x | bash -\n",
+                "yum install -y gcc-c++ make nodejs \n",
                 "\n",
-                "# Download nginx\n",
-                "pushd /opt/nginx\n",
-                "  wget http://nginx.org/download/nginx-1.11.5.tar.gz\n",
-                "  tar xzf nginx-1.11.5.tar.gz\n",
+
+                "# Setup the chat-app \n",
+                "mkdir /opt/chat-app \n",
+                "pushd /opt/chat-app \n",
+                  "wget https://github.com/stelligent/chat-app/releases/download/", { "Ref" : "AppVersion" }, "/chat-app.tar.gz \n",
+                  "tar -xvf chat-app.tar.gz \n",
+                  "npm install --no-optional \n",
+                  "export CHAT_PORT=80\n",
+                  "npm run start\n",
                 "popd\n",
-                "\n",
-                "# Install nginx\n",
-                "pushd /opt/nginx/nginx-1.11.5\n",
-                "  ./configure --sbin-path=/usr/local/sbin --with-http_ssl_module\n",
-                "  make\n",
-                "  make install\n",
-                "popd\n",
-                "\n",
-                "# Start nginx\n",
-                "/usr/local/sbin/nginx\n",
-                "\n",
+
                 "# Create the CloudFormation wait handle JSON\n",
                 "cat > /tmp/cfn-success <<CFNSUCCESS\n",
                 "{\n",
@@ -216,8 +220,10 @@
                 "}\n",
                 "CFNSUCCESS\n",
                 "\n",
+
                 "# Emit success to CloudFormation\n",
-                "curl -T /tmp/cfn-success \"${wait_handle}\"\n"
+                "curl -T /tmp/cfn-success \"${wait_handle}\"\n",
+                "\n"
               ]
             ]
           }

@@ -44,9 +44,7 @@ node('master') {
           rake 'acceptance:security_test'
 
           // Security / Config Rules Tests
-          dir('/opt/config-rule-status') {
-            sh "echo '{}' | gulp verify --stage prod --region ${region}"
-          }
+          rake 'acceptance:config_rules_test'
         }
       }
 

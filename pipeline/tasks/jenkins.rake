@@ -10,11 +10,10 @@ region = 'us-east-1' if ENV['AWS_REGION'].nil?
 namespace :jenkins do
   desc 'Create a Workshop VPC + Jenkins'
   # task :create, [:vpc_id, :subnet_id, :world_cidr] do |_, opts|
-  task :create, [:world_cidr] do |_, opts|
-    opts[:world_cidr] = '0.0.0.0/0'
-
+  task :create, [:world_cidr, :stack_name] do |_, opts|
     world_cidr = opts[:world_cidr]
     world_cidr = '0.0.0.0/0' if world_cidr.nil?
+    @stack_name << "-#{opts[:stack_name]}" unless opts[:stack_name].nil?
 
     # Compile the template
     cfn_template_path = 'provisioning/cloudformation/templates/workshop-jenkins'
