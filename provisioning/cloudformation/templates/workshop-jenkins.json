@@ -244,6 +244,7 @@
     "JenkinsServer": {
       "DependsOn": "InternetGatewayStack",
       "Properties": {
+        "KeyName": "DEVSECOPS-DEV",
         "ImageId": { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]},
         "InstanceType": {
           "Ref": "InstanceType"

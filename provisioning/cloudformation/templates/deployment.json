@@ -98,7 +98,7 @@
         "Handle": {
           "Ref": "WaitHandle"
         },
-        "Timeout": "300"
+        "Timeout": "3000"
       },
       "Type": "AWS::CloudFormation::WaitCondition"
     },
