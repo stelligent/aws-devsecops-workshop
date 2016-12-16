@@ -98,7 +98,7 @@
         "Handle": {
           "Ref": "WaitHandle"
         },
-        "Timeout": "3000"
+        "Timeout": "300"
       },
       "Type": "AWS::CloudFormation::WaitCondition"
     },
@@ -203,11 +203,11 @@
                 "# Setup the chat-app \n",
                 "mkdir /opt/chat-app \n",
                 "pushd /opt/chat-app \n",
-                  "wget https://github.com/stelligent/chat-app/releases/download/", { "Ref" : "AppVersion" }, "/chat-app.tar.gz \n",
-                  "tar -xvf chat-app.tar.gz \n",
-                  "npm install --no-optional \n",
-                  "export CHAT_PORT=80\n",
-                  "npm run start\n",
+                "  wget https://github.com/stelligent/chat-app/releases/download/", { "Ref" : "AppVersion" }, "/chat-app.tar.gz \n",
+                "  tar -xvf chat-app.tar.gz \n",
+                "  npm install --no-optional \n",
+                "  export CHAT_PORT=80\n",
+                "  npm run start\n",
                 "popd\n",
 
                 "# Create the CloudFormation wait handle JSON\n",
