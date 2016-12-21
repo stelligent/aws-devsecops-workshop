@@ -4,7 +4,7 @@ namespace :commit do
   desc 'Build application'
   task :build do
     # no op
-    puts 'The application is build from cloudformation userdata.'
+    puts 'The application is built from cloudformation userdata.'
   end
 
   desc 'Install custom CFN_Nag rules'

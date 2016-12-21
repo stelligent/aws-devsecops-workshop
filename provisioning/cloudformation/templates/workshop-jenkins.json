@@ -18,6 +18,12 @@
       "Default": "192.30.252.0/22"
     }
   },
+  "Mappings" : {
+    "RegionMap" : {
+      "us-east-1": { "AMI" : "ami-17042300" },
+      "us-east-2": { "AMI" : "ami-306a3055" }
+    }
+  },
   "Resources": {
     "InternetGatewayStack": {
       "Properties": {
@@ -238,7 +244,7 @@
     "JenkinsServer": {
       "DependsOn": "InternetGatewayStack",
       "Properties": {
-        "ImageId": "ami-17042300",
+        "ImageId": { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]},
         "InstanceType": {
           "Ref": "InstanceType"
         },
@@ -320,19 +326,23 @@
                 "\n",
                 "export HOME=/root\n",
                 "\n",
+
                 "# Install ZAP - Penetration Test\n",
                 "mkdir -p /opt/ZAP\n",
                 "pushd /opt/ZAP\n",
                 "  wget https://github.com/zaproxy/zaproxy/releases/download/2.5.0/ZAP_2.5.0_Linux.tar.gz\n",
                 "  tar xf ZAP_2.5.0_Linux.tar.gz\n",
                 "  pushd ZAP_2.5.0\n",
-                "    nohup ./zap.sh -daemon -port 80 -config api.disablekey=true &\n",
+                "    nohup ./zap.sh -daemon -port 80 -config api.disablekey=true </dev/null >/var/log/zap.out 2>&1 &\n",
                 "  popd\n",
                 "popd\n",
                 "\n",
+
                 "# Install apache benchmark - Easy Capacity Testing\n",
+                "apt-get update\n",
                 "apt-get install -y apache2-utils\n",
                 "\n",
+
                 "# Install nodejs for config-rules-status\n",
                 "curl -sL https://deb.nodesource.com/setup_6.x | bash -\n",
                 "apt-get install -y nodejs\n",
