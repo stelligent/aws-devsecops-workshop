@@ -2,10 +2,16 @@
 A continuous security pipeline demo for the AWS DevSecOps Workshop.
 
 ## Prerequisites
-Before you get started, there's a couple things you're going to need to prepare.
+Before you get started, there are a few things you will to need to prepare.
 
 ### AWS Account
 We recommend using a new AWS account for the workshop environment. You can also use an existing account, but make sure the account has no existing resources created. Some of the security checks executed by this workshop may discover resources that are not configured to best practices and fail your pipeline.
+
+### AWS CLI
+[Install the aws-cli](http://docs.aws.amazon.com/cli/latest/userguide/installing.html#install-bundle-other-os) and use `aws configure` to set your AWS Access Keys for your development environment (the account specified above).
+
+#### Ruby 2.2.5
+Your development environment *must* have ruby 2.2.5 or better to install the dependencies of the scripts used to stand up the workshop environment. [RVM](https://rvm.io/) is a tool that can be used for switching between multiple versions.
 
 ## Setup Jenkins
 This repository contains some scripts to stand up a Jenkins in AWS pre-configured to execute this pipeline.
