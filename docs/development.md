@@ -13,7 +13,7 @@ On your new account, create an IAM user with MFA enabled to use to provision you
 ### Development Environment
 
 #### Ruby 2.2.5
-You're development environment must have ruby 2.2.5 or better to install the dependencies of the scripts used to stand up the workshop environment. [RVM](https://rvm.io/) is a tool that can be used for switching between multiple versions.
+Your development environment must have ruby 2.2.5 or better to install the dependencies of the scripts used to stand up the workshop environment. [RVM](https://rvm.io/) is a tool that can be used for switching between multiple versions.
 
 #### AWS Credentials
 [Install the aws-cli](http://docs.aws.amazon.com/cli/latest/userguide/installing.html#install-bundle-other-os) and use `aws configure` to set your AWS Access Keys into your development environment.
