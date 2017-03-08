@@ -34,7 +34,7 @@ module Pipeline
 
     def run_penetration_test
       system '/var/lib/jenkins/pen-test-app.py',
-             '--zap-host', 'localhost:80',
+             '--zap-host', 'localhost:9000',
              '--target', "http://#{webserver_ip}"
       system 'behave features/penetration_test.feature'
     end
