@@ -364,7 +364,7 @@
                 "popd\n",
                 "pushd /etc/nginx/sites-enabled\n",
                 "  rm -f default\n",
-                "  ln -s /etc/nginx/sites-available/jenkins.conf ./jenkins"
+                "  ln -s /etc/nginx/sites-available/jenkins.conf ./jenkins",
                 "popd\n",
                 "\n",
                 "# Ensure Nginx is running for proxying Jenkins\n",
