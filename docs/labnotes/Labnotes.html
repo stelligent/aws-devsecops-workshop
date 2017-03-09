@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Labnotes</title>
+
+
+<style type="text/css">
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote {
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB", Arial, sans-serif;
+    font-size: 13px;
+    line-height: 18px;
+    color: #737373;
+    background-color: white;
+    margin: 10px 13px 10px 13px;
+}
+table {
+	margin: 10px 0 15px 0;
+	border-collapse: collapse;
+}
+td,th {	
+	border: 1px solid #ddd;
+	padding: 3px 10px;
+}
+th {
+	padding: 5px 10px;	
+}
+
+a {
+    color: #0069d6;
+}
+a:hover {
+    color: #0050a3;
+    text-decoration: none;
+}
+a img {
+    border: none;
+}
+p {
+    margin-bottom: 9px;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #404040;
+    line-height: 36px;
+}
+h1 {
+    margin-bottom: 18px;
+    font-size: 30px;
+}
+h2 {
+    font-size: 24px;
+}
+h3 {
+    font-size: 18px;
+}
+h4 {
+    font-size: 16px;
+}
+h5 {
+    font-size: 14px;
+}
+h6 {
+    font-size: 13px;
+}
+hr {
+    margin: 0 0 19px;
+    border: 0;
+    border-bottom: 1px solid #ccc;
+}
+blockquote {
+    padding: 13px 13px 21px 15px;
+    margin-bottom: 18px;
+    font-family:georgia,serif;
+    font-style: italic;
+}
+blockquote:before {
+    content:"\201C";
+    font-size:40px;
+    margin-left:-10px;
+    font-family:georgia,serif;
+    color:#eee;
+}
+blockquote p {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 18px;
+    margin-bottom: 0;
+    font-style: italic;
+}
+code, pre {
+    font-family: Monaco, Andale Mono, Courier New, monospace;
+}
+code {
+    background-color: #fee9cc;
+    color: rgba(0, 0, 0, 0.75);
+    padding: 1px 3px;
+    font-size: 12px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+pre {
+    display: block;
+    padding: 14px;
+    margin: 0 0 18px;
+    line-height: 16px;
+    font-size: 11px;
+    border: 1px solid #d9d9d9;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+pre code {
+    background-color: #fff;
+    color:#737373;
+    font-size: 11px;
+    padding: 0;
+}
+sup {
+    font-size: 0.83em;
+    vertical-align: super;
+    line-height: 0;
+}
+* {
+	-webkit-print-color-adjust: exact;
+}
+@media screen and (min-width: 914px) {
+    body {
+        width: 854px;
+        margin:10px auto;
+    }
+}
+@media print {
+	body,code,pre code,h1,h2,h3,h4,h5,h6 {
+		color: black;
+	}
+	table, pre {
+		page-break-inside: avoid;
+	}
+}
+</style>
+
+<style type="text/css">
+/**
+ * prism.js default theme for JavaScript, CSS and HTML
+ * Based on dabblet (http://dabblet.com)
+ * @author Lea Verou
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: black;
+	background: none;
+	text-shadow: 0 1px white;
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+	text-shadow: none;
+	background: #b3d4fc;
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+	text-shadow: none;
+	background: #b3d4fc;
+}
+
+@media print {
+	code[class*="language-"],
+	pre[class*="language-"] {
+		text-shadow: none;
+	}
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #f5f2f0;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: slategray;
+}
+
+.token.punctuation {
+	color: #999;
+}
+
+.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #905;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #690;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+	color: #a67f59;
+	background: hsla(0, 0%, 100%, .5);
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+	color: #07a;
+}
+
+.token.function {
+	color: #DD4A68;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+	color: #e90;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<h1 id="toc_0">AWS DevSecOps Workshop Lab Notes</h1>
+
+<h2 id="toc_1">Table of Contents</h2>
+
+<ul class="toc">
+<li>
+<a href="#toc_0">AWS DevSecOps Workshop Lab Notes</a>
+<ul>
+<li>
+<a href="#toc_1">Table of Contents</a>
+</li>
+<li>
+<a href="#toc_2">Section 1: Introduction</a>
+<ul>
+<li>
+<a href="#toc_3">Learning Objectives</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#toc_4">Section 2: Setup</a>
+<ul>
+<li>
+<a href="#toc_5">Prerequisites</a>
+</li>
+<li>
+<a href="#toc_6">Fork the Project on GitHub</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#toc_7">Section 3: Deploying the CloudFormation Template (Unchanged)</a>
+<ul>
+<li>
+<a href="#toc_8">Deploy Template</a>
+</li>
+<li>
+<a href="#toc_9">Monitor Stack Creation</a>
+</li>
+<li>
+<a href="#toc_10">View Stack Results</a>
+<ul>
+<li>
+<a href="#toc_11">Stack</a>
+</li>
+<li>
+<a href="#toc_12">VPC</a>
+</li>
+<li>
+<a href="#toc_13">EC2 Instance</a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<a href="#toc_14">Section 4: Running the Jenkins Pipeline (Unchanged)</a>
+</li>
+<li>
+<a href="#toc_15">Section 5: Running an Altered Jenkins Pipeline</a>
+<ul>
+<li>
+<a href="#toc_16">Simple Test: Is it up?</a>
+</li>
+<li>
+<a href="#toc_17">Complex Test: Alter the test conditions</a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+<h2 id="toc_2">Section 1: Introduction</h2>
+
+<h3 id="toc_3">Learning Objectives</h3>
+
+<p>By the end of this workshop, you will haveaws-devsecops-workshop</p>
+
+<ul>
+<li>created a VPC and an EC2 instance running <a href="https://jenkins.io/">Jenkins</a></li>
+<li>be able to run a Jenkins security pipeline job that
+
+<ul>
+<li>deploys infrastructure (an EC2 instance)</li>
+<li>Installs a simple application on that EC2 instance</li>
+<li>Runs <a href="http://rspec.info/">RSpec</a> to validate application installation success</li>
+<li>Runs a capacity test using <a href="https://httpd.apache.org/docs/2.4/programs/ab.html">Apache Benchmark</a></li>
+<li>Runs a security test using <a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP ZAP</a></li>
+</ul></li>
+<li>altered the pipeline to demonstrate how to introduce errors and failures</li>
+</ul>
+
+<h2 id="toc_4">Section 2: Setup</h2>
+
+<h3 id="toc_5">Prerequisites</h3>
+
+<p>See the <a href="https://github.com/stelligent/blob/master/README.md">project README</a> for the full list of prerequisite tools.</p>
+
+<p>In brief, the only firm requirement is having an active, and ideally empty, AWS account with full access to your AWS profile (the ability to run CloudFormation templates, configure VPCs, create EC2 instances and Internet gateways, etc.)</p>
+
+<h3 id="toc_6">Fork the Project on GitHub</h3>
+
+<p>While the README for this project specifies several methods for 
+In order to allow for customization and testing, you will need to create a copy of the project. In order to do so, you should:</p>
+
+<ol>
+<li>Ensure that you have a <a href="https://github.com/">GitHub</a> account and are signed in to GitHub.</li>
+<li>Navgiate to the <a href="https://github.com/stelligent/aws-devsecops-workshop">Github page</a> for the DevSecOps project.</li>
+<li>Click the <q>Fork</q> button at the top right to make a copy of the project into your own GitHub workspace.</li>
+</ol>
+
+<h2 id="toc_7">Section 3: Deploying the CloudFormation Template (Unchanged)</h2>
+
+<h3 id="toc_8">Deploy Template</h3>
+
+<p>During your first run of the pipeline, you may safely use the original project (or your unaltered GitHub fork of the original project).</p>
+
+<ol>
+<li>To do so, simply navigate to the GitHub project page and click the <q>Launch Stack</q> button. <br /><img src="images/launch-stack.png" alt="Launch stack"><br /><br /></li>
+<li>Next, verify that the selected template is the unaltered one stored in S3, then click <q>Next</q>. <img src="images/select-template.png" alt="Select CloudFormation template to run"><br /><br /></li>
+<li>For the purposes of this exercise, you may leave the details unchanged. Click <q>Next</q>. <img src="images/stack-details.png" alt="Specify CF stack details"><br /><br /></li>
+<li>You may (optionally) add tags and an IAM role to your stack. Then click <q>Next</q>. <img src="images/tag-stack.png" alt="Tag the CF stack"><br /><br /></li>
+<li>Once you have completed all the configuration steps, take a moment to review the details. <img src="images/review-stack-details.png" alt="Review the CF stack details"><br /><br /></li>
+<li>Make sure to acknowledge the <q>CloudFormation may create IAM resources</q> checkbox and then click <q>Create</q>. <img src="images/review-stack-details-2.png" alt="Review the CF stack details 2"><br /><br /></li>
+</ol>
+
+<h3 id="toc_9">Monitor Stack Creation</h3>
+
+<p>You can keep tabs on your CloudFormation stack&rsquo;s creation progress via the AWS Console CloudFormation screen</p>
+
+<p><img src="images/cfprogress.png" alt="CF Progress"><br /><br /></p>
+
+<h3 id="toc_10">View Stack Results</h3>
+
+<p>Once the stack creation is complete, you can take a quick look at the results via the AWS Console.</p>
+
+<h4 id="toc_11">Stack</h4>
+
+<p><img src="images/stack.png" alt="Stack"><br /><br /></p>
+
+<h4 id="toc_12">VPC</h4>
+
+<p><img src="images/vpc.png" alt="VPC"><br /><br /></p>
+
+<h4 id="toc_13">EC2 Instance</h4>
+
+<p>Take note of the public IP adress of the Jenkins EC2 instance created during this step, as you will need to have it available to proceed on to section 4. <br /><img src="images/ec2instance.png" alt="EC2"><br /><br /></p>
+
+<h2 id="toc_14">Section 4: Running the Jenkins Pipeline (Unchanged)</h2>
+
+<ol>
+<li>Once the initial stack has been created, you will have access to a single EC2 instance running Jenkins. Using the public IP address listed in Section 3-&gt;EC2 Instance, direct your web browser to <code>http://[EC2 public IP]:8080</code> in order to load the Jenkins login page. <br /><img src="images/jenkinslogin.png" alt="Jenkins login"><br /><br /></li>
+<li>Log in to the Jenkins instance using the default username (<code>workshop</code>) and password (<code>Fancy$Treasury!Effective!Throw^6</code>). You should see a view similar to this: <img src="images/jenkinsinitial.png" alt="Jenkins initial"><br /><br /></li>
+<li>Click the <code>seed-aws-devops-workshop</code> link under <q>Name</q> in the right-hand table. You should see the following screen. <img src="images/jenkinsseedpre.png" alt="Jenkins seed job pre-run"><br /><br /></li>
+<li>Click <q>Build Now</q> in the left-hand menu. </li>
+<li>This pipeline job will run fairly quickly and create a new job entry on the dashboard, <q>AWS DevSecOps Workshop Pipeline</q>. <img src="images/pipelinelist.png" alt="Pipeline list"><br /><br /></li>
+<li>Click on <q>AWS DevSecOps Workshop Pipeline</q>.</li>
+<li>Click <q>Build</q> in the left-hand menu.</li>
+<li>You may monitor the progress of the pipeline job as it steps through the various pipeline stages. <img src="images/pipelineprogress.png" alt="Pipeline progress"><br /><br /></li>
+<li>Once all the pipeline steps are complete, you should see a screen similar to this: <img src="images/pipelinecomplete.png" alt="Pipeline complete"><br /><br /></li>
+<li>Navigate back to your AWS Console and to the EC2 Instances screen. You should see two newly-created EC2 instances named <q>AWS DevSecOps Workshop - acceptance</q> and <q>AWS DevSecOps Workshop - production</q>. <img src="images/ec2success.png" alt="EC2 instance success"><br /><br /></li>
+<li>Note the public IP address of the EC2 instances.</li>
+<li>Direct your browser to either IP address to verify that the extremely simple Nginx installation was configured and started correctly by the build pipeline. <br /><img src="images/nginxsuccess.png" alt="Nginx success"><br /><br /></li>
+<li>You are now finished with the standard, unaltered portion of the workshop.</li>
+</ol>
+
+<h2 id="toc_15">Section 5: Running an Altered Jenkins Pipeline</h2>
+
+<h3 id="toc_16">Simple Test: Is it up?</h3>
+
+<p>For this section, we will simply test whether a given Ec2 instance is responding to HTTP traffic. Since we have not established direct access to the hosts and are thus unable to stop the service directly, simply do the following:</p>
+
+<ol>
+<li>Using the EC2 management console, set the Acceptance instance&rsquo;s Instance State to <q>Stop</q>.</li>
+<li>Once it has finished powering down, return to the Jenkins console and click <q>Build Now</q> again on the <q>AWS DevSecOps Pipeline</q> job.</li>
+<li>Your Jenkins pipeline should fail at the <q>Acceptance</q> stage. <img src="images/jenkinsfail.png" alt="Jenkins fail"><br /><br /></li>
+<li>If you wish, you may examine the Jenkins results in more detail. They aren&rsquo;t particularly helpful in diagnosing this particular error. <img src="images/faillog-dialog.png" alt="Jenkins dialog"><br /><br /><img src="images/faillog.png" alt="Jenkins log"><br /><br /></li>
+<li>Return to the EC2 management console and set the Acceptance instance&rsquo;s Instance State to <q>Start</q>.</li>
+<li>Once the EC2 instance has fully resumed, return to the Jenkins pipeline page and click <q>Build Now</q> again.</li>
+<li>The Jenkins pipeline should now succeed. <br /><img src="images/buildsuccess.png" alt="Build success"><br /><br /></li>
+<li>You may, if you wish, repeat the above steps with the <q>Production</q> EC2 instance. It should fail at the final stage of the pipeline (<q>Deployment</q>). <img src="images/prodfail.png" alt="Prod failure"><br /><br /></li>
+<li>Return the <q>Production</q> EC2 instance to <q>Start</q>. Optionally, you may re-run the pipeline to ensure that the pipeline succeeds once the <q>Production</q> instance has fully returned to service.</li>
+</ol>
+
+<h3 id="toc_17">Complex Test: Alter the test conditions</h3>
+
+<p>For this test, you will need to utilize the fork of the project repository (listed below <q>Prerequisites</q> above).</p>
+
+<ol>
+<li>Navigate to your fork on Github.</li>
+<li>Click on the <q>Clone or Download</q> button at the top right.</li>
+<li>Click <q>Use SSH</q>.</li>
+<li>Copy the string starting with <code>git@github.com...</code></li>
+<li>Now navigate to your Jenkins console.</li>
+<li>Click on the <q>AWS DevSecOps Workshop Pipeline</q> job.</li>
+<li>Click <q>Configure</q> in the left-hand navigation.</li>
+<li>Click the <q>Pipeline</q> tab, or scroll down to the bottom of the page.</li>
+<li>Under <q>Repository URL</q>, replace the value with the string you just copied from Github. <img src="images/githuburi.png" alt="Github URI"><br /><br /></li>
+<li>Click <q>Save</q>.</li>
+<li><strong>OPTIONAL:</strong> You may run another pipeline job to ensure that everything is succeeding with the altered Github link (it should be).</li>
+<li>Return to your Github fork in your web browser.</li>
+<li>Navigate to <code>https://github.com/[Github username]/aws-devsecops-workshop/blob/master/features/webserver.feature</code>. This file describes some of the acceptance tests that are performed on the Acceptance and Production instances&#39; web outputs.</li>
+<li>Make sure you&rsquo;re logged in.</li>
+<li>Click on <q>Edit this file</q> at the top right. <br /><img src="images/editthis.png" alt="Edit this file"><br /><br /></li>
+<li>Change <q>Welcome to <strong>nginx</strong> on the Amazon Linux AMI!</q> to something else under the <code>@acceptance</code> portion of the file. For instance: <br /><br /><img src="images/changestring.png" alt="Change string"><br /><br /></li>
+<li>Scroll to the bottom and click <q>Commit changes</q>.</li>
+<li>Now, return to your Jenkins console.</li>
+<li>Click <q>Build Now</q>.</li>
+<li>The pipeline should fail at the Acceptance phase. <br /><img src="images/acceptancefailure.png" alt="Acceptance failure."><br /><br /></li>
+<li>Return to the Github project and edit the file again, this time replacing the string with the correct string (preserved under the <code>@production</code> section below the <code>@acceptance</code> one).</li>
+<li>Click <q>Commit changes</q>.</li>
+<li>Now return to your Jenkins console.</li>
+<li>Click <q>Build Now</q> again.</li>
+<li>This time, the pipeline should succeed. <br /><img src="images/buildsuccess2.png" alt="Build success"><br /><br /></li>
+<li><strong>OPTIONAL:</strong> Repeat the above steps using the <code>@production</code> section instead. Your pipeline should fail at the <q>Deployment</q> stage instead of the <q>Acceptance</q> one.</li>
+</ol>
+
+<p>Congratulations! You have now demonstrated that you can alter the test conditions for the Acceptance and Production using your personal Github fork of the project. </p>
+
+
+
+<script type="text/javascript">
+var _self="undefined"!=typeof window?window:"undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?self:{},Prism=function(){var e=/\blang(?:uage)?-(\w+)\b/i,t=0,n=_self.Prism={util:{encode:function(e){return e instanceof a?new a(e.type,n.util.encode(e.content),e.alias):"Array"===n.util.type(e)?e.map(n.util.encode):e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\u00a0/g," ")},type:function(e){return Object.prototype.toString.call(e).match(/\[object (\w+)\]/)[1]},objId:function(e){return e.__id||Object.defineProperty(e,"__id",{value:++t}),e.__id},clone:function(e){var t=n.util.type(e);switch(t){case"Object":var a={};for(var r in e)e.hasOwnProperty(r)&&(a[r]=n.util.clone(e[r]));return a;case"Array":return e.map&&e.map(function(e){return n.util.clone(e)})}return e}},languages:{extend:function(e,t){var a=n.util.clone(n.languages[e]);for(var r in t)a[r]=t[r];return a},insertBefore:function(e,t,a,r){r=r||n.languages;var l=r[e];if(2==arguments.length){a=arguments[1];for(var i in a)a.hasOwnProperty(i)&&(l[i]=a[i]);return l}var o={};for(var s in l)if(l.hasOwnProperty(s)){if(s==t)for(var i in a)a.hasOwnProperty(i)&&(o[i]=a[i]);o[s]=l[s]}return n.languages.DFS(n.languages,function(t,n){n===r[e]&&t!=e&&(this[t]=o)}),r[e]=o},DFS:function(e,t,a,r){r=r||{};for(var l in e)e.hasOwnProperty(l)&&(t.call(e,l,e[l],a||l),"Object"!==n.util.type(e[l])||r[n.util.objId(e[l])]?"Array"!==n.util.type(e[l])||r[n.util.objId(e[l])]||(r[n.util.objId(e[l])]=!0,n.languages.DFS(e[l],t,l,r)):(r[n.util.objId(e[l])]=!0,n.languages.DFS(e[l],t,null,r)))}},plugins:{},highlightAll:function(e,t){var a={callback:t,selector:'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'};n.hooks.run("before-highlightall",a);for(var r,l=a.elements||document.querySelectorAll(a.selector),i=0;r=l[i++];)n.highlightElement(r,e===!0,a.callback)},highlightElement:function(t,a,r){for(var l,i,o=t;o&&!e.test(o.className);)o=o.parentNode;o&&(l=(o.className.match(e)||[,""])[1],i=n.languages[l]),t.className=t.className.replace(e,"").replace(/\s+/g," ")+" language-"+l,o=t.parentNode,/pre/i.test(o.nodeName)&&(o.className=o.className.replace(e,"").replace(/\s+/g," ")+" language-"+l);var s=t.textContent,u={element:t,language:l,grammar:i,code:s};if(!s||!i)return n.hooks.run("complete",u),void 0;if(n.hooks.run("before-highlight",u),a&&_self.Worker){var c=new Worker(n.filename);c.onmessage=function(e){u.highlightedCode=e.data,n.hooks.run("before-insert",u),u.element.innerHTML=u.highlightedCode,r&&r.call(u.element),n.hooks.run("after-highlight",u),n.hooks.run("complete",u)},c.postMessage(JSON.stringify({language:u.language,code:u.code,immediateClose:!0}))}else u.highlightedCode=n.highlight(u.code,u.grammar,u.language),n.hooks.run("before-insert",u),u.element.innerHTML=u.highlightedCode,r&&r.call(t),n.hooks.run("after-highlight",u),n.hooks.run("complete",u)},highlight:function(e,t,r){var l=n.tokenize(e,t);return a.stringify(n.util.encode(l),r)},tokenize:function(e,t){var a=n.Token,r=[e],l=t.rest;if(l){for(var i in l)t[i]=l[i];delete t.rest}e:for(var i in t)if(t.hasOwnProperty(i)&&t[i]){var o=t[i];o="Array"===n.util.type(o)?o:[o];for(var s=0;s<o.length;++s){var u=o[s],c=u.inside,g=!!u.lookbehind,h=!!u.greedy,f=0,d=u.alias;u=u.pattern||u;for(var p=0;p<r.length;p++){var m=r[p];if(r.length>e.length)break e;if(!(m instanceof a)){u.lastIndex=0;var y=u.exec(m),v=1;if(!y&&h&&p!=r.length-1){var b=r[p+1].matchedStr||r[p+1],k=m+b;if(p<r.length-2&&(k+=r[p+2].matchedStr||r[p+2]),u.lastIndex=0,y=u.exec(k),!y)continue;var w=y.index+(g?y[1].length:0);if(w>=m.length)continue;var _=y.index+y[0].length,P=m.length+b.length;if(v=3,P>=_){if(r[p+1].greedy)continue;v=2,k=k.slice(0,P)}m=k}if(y){g&&(f=y[1].length);var w=y.index+f,y=y[0].slice(f),_=w+y.length,S=m.slice(0,w),O=m.slice(_),j=[p,v];S&&j.push(S);var A=new a(i,c?n.tokenize(y,c):y,d,y,h);j.push(A),O&&j.push(O),Array.prototype.splice.apply(r,j)}}}}}return r},hooks:{all:{},add:function(e,t){var a=n.hooks.all;a[e]=a[e]||[],a[e].push(t)},run:function(e,t){var a=n.hooks.all[e];if(a&&a.length)for(var r,l=0;r=a[l++];)r(t)}}},a=n.Token=function(e,t,n,a,r){this.type=e,this.content=t,this.alias=n,this.matchedStr=a||null,this.greedy=!!r};if(a.stringify=function(e,t,r){if("string"==typeof e)return e;if("Array"===n.util.type(e))return e.map(function(n){return a.stringify(n,t,e)}).join("");var l={type:e.type,content:a.stringify(e.content,t,r),tag:"span",classes:["token",e.type],attributes:{},language:t,parent:r};if("comment"==l.type&&(l.attributes.spellcheck="true"),e.alias){var i="Array"===n.util.type(e.alias)?e.alias:[e.alias];Array.prototype.push.apply(l.classes,i)}n.hooks.run("wrap",l);var o="";for(var s in l.attributes)o+=(o?" ":"")+s+'="'+(l.attributes[s]||"")+'"';return"<"+l.tag+' class="'+l.classes.join(" ")+'" '+o+">"+l.content+"</"+l.tag+">"},!_self.document)return _self.addEventListener?(_self.addEventListener("message",function(e){var t=JSON.parse(e.data),a=t.language,r=t.code,l=t.immediateClose;_self.postMessage(n.highlight(r,n.languages[a],a)),l&&_self.close()},!1),_self.Prism):_self.Prism;var r=document.currentScript||[].slice.call(document.getElementsByTagName("script")).pop();return r&&(n.filename=r.src,document.addEventListener&&!r.hasAttribute("data-manual")&&document.addEventListener("DOMContentLoaded",n.highlightAll)),_self.Prism}();"undefined"!=typeof module&&module.exports&&(module.exports=Prism),"undefined"!=typeof global&&(global.Prism=Prism);
+</script>
+
+<script type="text/x-mathjax-config">
+(function () {
+
+MathJax.Hub.Config({
+	'showProcessingMessages': false,
+	'messageStyle': 'none'
+});
+
+if (typeof MathJaxListener !== 'undefined') {
+	MathJax.Hub.Register.StartupHook('End', function () {
+		MathJaxListener.invokeCallbackForKey_('End');
+	});
+}
+
+})();
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+</body>
+
+</html>
