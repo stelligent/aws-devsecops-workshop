@@ -5,14 +5,14 @@ require_relative '../spec_helper'
 
 describe 'Nginx Installation' do
   # Nginx downloaded in correct location
-  describe file('/opt/nginx/nginx-1.11.5') do
+  describe file('/usr/share/nginx') do
     it { should exist }
     it { should be_directory }
   end
 
   # Correct version of nginx
-  describe command('/usr/local/sbin/nginx -v') do
-    its(:stderr) { should match(%r{nginx version: nginx/1.11.5}) }
+  describe command('/usr/sbin/nginx -v') do
+    its(:stderr) { should match(%r{nginx version: nginx/1.10.1}) }
     its(:exit_status) { should eq 0 }
   end
 
