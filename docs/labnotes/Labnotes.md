@@ -71,10 +71,53 @@ Take note of the public IP adress of the Jenkins EC2 instance created during thi
 7. Click "Build" in the left-hand menu.
 8. You may monitor the progress of the pipeline job as it steps through the various pipeline stages. ![Pipeline progress](images/pipelineprogress.png)<br /><br />
 9. Once all the pipeline steps are complete, you should see a screen similar to this: ![Pipeline complete](images/pipelinecomplete.png)<br /><br />
-10. Navigate back to your AWS Console and to the EC2 Instances screen. You should see a newly-created EC2 instance named "AWS DevSecOps Workshop - Jenkins - UBUNTU". ![EC2 instance success](images/ec2success.png)<br /><br />
-11. Note the public IP address of the EC2 instance.
-12. Direct your browser to said IP address to verify that the extremely simple Nginx installation was configured and started correctly by the build pipeline. <br />![Nginx success](images/nginxsuccess.png)<br /><br />
+10. Navigate back to your AWS Console and to the EC2 Instances screen. You should see two newly-created EC2 instances named "AWS DevSecOps Workshop - acceptance" and "AWS DevSecOps Workshop - production". ![EC2 instance success](images/ec2success.png)<br /><br />
+11. Note the public IP address of the EC2 instances.
+12. Direct your browser to either IP address to verify that the extremely simple Nginx installation was configured and started correctly by the build pipeline. <br />![Nginx success](images/nginxsuccess.png)<br /><br />
 13. You are now finished with the standard, unaltered portion of the workshop.
 
-## Section 5: Deploying an Altered CloudFormation Template [Future/Work-in-progress] 
-## Section 6: Running an Altered Jenkins Pipeline [Future/Work-in-progress] 
+## Section 5: Running an Altered Jenkins Pipeline
+### Simple Test: Is it up?
+For this section, we will simply test whether a given Ec2 instance is responding to HTTP traffic. Since we have not established direct access to the hosts and are thus unable to stop the service directly, simply do the following:
+
+1. Using the EC2 management console, set the Acceptance instance's Instance State to "Stop".
+2. Once it has finished powering down, return to the Jenkins console and click "Build Now" again on the "AWS DevSecOps Pipeline" job.
+3. Your Jenkins pipeline should fail at the "Acceptance" stage. ![Jenkins fail](images/jenkinsfail.png)<br /><br />
+4. If you wish, you may examine the Jenkins results in more detail. They aren't particularly helpful in diagnosing this particular error. ![Jenkins dialog](images/faillog-dialog.png)<br /><br />![Jenkins log](images/faillog.png)<br /><br />
+5. Return to the EC2 management console and set the Acceptance instance's Instance State to "Start".
+6. Once the EC2 instance has fully resumed, return to the Jenkins pipeline page and click "Build Now" again.
+7. The Jenkins pipeline should now succeed. <br />![Build success](images/buildsuccess.png)<br /><br />
+8. You may, if you wish, repeat the above steps with the "Production" EC2 instance. It should fail at the final stage of the pipeline ("Deployment"). ![Prod failure](images/prodfail.png)<br /><br />
+9. Return the "Production" EC2 instance to "Start". Optionally, you may re-run the pipeline to ensure that the pipeline succeeds once the "Production" instance has fully returned to service.
+
+### Complex Test: Alter the test conditions
+For this test, you will need to utilize the fork of the project repository (listed below "Prerequisites" above).
+
+1. Navigate to your fork on Github.
+2. Click on the "Clone or Download" button at the top right.
+3. Click "Use SSH".
+4. Copy the string starting with `git@github.com...`
+5. Now navigate to your Jenkins console.
+6. Click on the "AWS DevSecOps Workshop Pipeline" job.
+7. Click "Configure" in the left-hand navigation.
+8. Click the "Pipeline" tab, or scroll down to the bottom of the page.
+9. Under "Repository URL", replace the value with the string you just copied from Github. ![Github URI](images/githuburi.png)<br /><br />
+10. Click "Save".
+11. **OPTIONAL:** You may run another pipeline job to ensure that everything is succeeding with the altered Github link (it should be).
+12. Return to your Github fork in your web browser.
+13. Navigate to `https://github.com/[Github username]/aws-devsecops-workshop/blob/master/features/webserver.feature`. This file describes some of the acceptance tests that are performed on the Acceptance and Production instances' web outputs.
+14. Make sure you're logged in.
+15. Click on "Edit this file" at the top right. <br />![Edit this file](images/editthis.png)<br /><br />
+16. Change "Welcome to <strong>nginx</strong> on the Amazon Linux AMI!" to something else under the `@acceptance` portion of the file. For instance: <br /><br />![Change string](images/changestring.png)<br /><br />
+17. Scroll to the bottom and click "Commit changes".
+18. Now, return to your Jenkins console.
+19. Click "Build Now".
+20. The pipeline should fail at the Acceptance phase. <br />![Acceptance failure.](images/acceptancefailure.png)<br /><br />
+21. Return to the Github project and edit the file again, this time replacing the string with the correct string (preserved under the `@production` section below the `@acceptance` one).
+22. Click "Commit changes".
+23. Now return to your Jenkins console.
+24. Click "Build Now" again.
+25. This time, the pipeline should succeed. <br />![Build success](images/buildsuccess2.png)<br /><br />
+26. **OPTIONAL:** Repeat the above steps using the `@production` section instead. Your pipeline should fail at the "Deployment" stage instead of the "Acceptance" one.
+
+Congratulations! You have now demonstrated that you can alter the test conditions for the Acceptance and Production using your personal Github fork of the project. 
