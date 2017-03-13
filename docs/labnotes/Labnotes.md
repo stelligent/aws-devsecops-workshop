@@ -1,7 +1,4 @@
 # AWS DevSecOps Workshop Lab Notes
-## Table of Contents
-[TOC]
-
 ## Section 1: Introduction
 
 ### Learning Objectives
