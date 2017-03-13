@@ -6,7 +6,7 @@
 
 ### Learning Objectives
 
-By the end of this workshop, you will haveaws-devsecops-workshop
+By the end of this workshop, you will have
 
 * created a VPC and an EC2 instance running [Jenkins](https://jenkins.io/)
 * be able to run a Jenkins security pipeline job that
@@ -25,7 +25,7 @@ See the [project README](https://github.com/stelligent/blob/master/README.md) fo
 In brief, the only firm requirement is having an active, and ideally empty, AWS account with full access to your AWS profile (the ability to run CloudFormation templates, configure VPCs, create EC2 instances and Internet gateways, etc.)
 
 ### Fork the Project on GitHub
-While the README for this project specifies several methods for 
+While the README for this project specifies several methods for
 In order to allow for customization and testing, you will need to create a copy of the project. In order to do so, you should:
 
 1. Ensure that you have a [GitHub](https://github.com/) account and are signed in to GitHub.
@@ -65,7 +65,7 @@ Take note of the public IP adress of the Jenkins EC2 instance created during thi
 1. Once the initial stack has been created, you will have access to a single EC2 instance running Jenkins. Using the public IP address listed in Section 3->EC2 Instance, direct your web browser to `http://[EC2 public IP]:8080` in order to load the Jenkins login page. <br />![Jenkins login](images/jenkinslogin.png)<br /><br />
 2. Log in to the Jenkins instance using the default username (`workshop`) and password (`Fancy$Treasury!Effective!Throw^6`). You should see a view similar to this: ![Jenkins initial](images/jenkinsinitial.png)<br /><br />
 3. Click the `seed-aws-devops-workshop` link under "Name" in the right-hand table. You should see the following screen. ![Jenkins seed job pre-run](images/jenkinsseedpre.png)<br /><br />
-4. Click "Build Now" in the left-hand menu. 
+4. Click "Build Now" in the left-hand menu.
 5. This pipeline job will run fairly quickly and create a new job entry on the dashboard, "AWS DevSecOps Workshop Pipeline". ![Pipeline list](images/pipelinelist.png)<br /><br />
 6. Click on "AWS DevSecOps Workshop Pipeline".
 7. Click "Build" in the left-hand menu.
@@ -120,4 +120,4 @@ For this test, you will need to utilize the fork of the project repository (list
 25. This time, the pipeline should succeed. <br />![Build success](images/buildsuccess2.png)<br /><br />
 26. **OPTIONAL:** Repeat the above steps using the `@production` section instead. Your pipeline should fail at the "Deployment" stage instead of the "Acceptance" one.
 
-Congratulations! You have now demonstrated that you can alter the test conditions for the Acceptance and Production using your personal Github fork of the project. 
+Congratulations! You have now demonstrated that you can alter the test conditions for the Acceptance and Production using your personal Github fork of the project.
