@@ -124,6 +124,14 @@
             "CidrIp": {
               "Ref": "WorldCIDR"
             }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": {
+              "Ref": "WorldCIDR"
+            }
           }
         ],
         "SecurityGroupEgress": [
@@ -247,7 +255,7 @@
         "Handle": {
           "Ref": "WaitHandle"
         },
-        "Timeout": "600"
+        "Timeout": "900"
       },
       "Type": "AWS::CloudFormation::WaitCondition"
     },
@@ -342,9 +350,27 @@
                 "  wget https://github.com/zaproxy/zaproxy/releases/download/2.5.0/ZAP_2.5.0_Linux.tar.gz\n",
                 "  tar xf ZAP_2.5.0_Linux.tar.gz\n",
                 "  pushd ZAP_2.5.0\n",
-                "    nohup ./zap.sh -daemon -port 80 -config api.disablekey=true &\n",
+                "    nohup ./zap.sh -daemon -port 9000 -config api.disablekey=true &\n",
                 "  popd\n",
                 "popd\n",
+                "\n",
+                "# Install Nginx for proxying Jenkins\n",
+                "apt-get update\n",
+                "apt-get install -y nginx\n",
+                "\n",
+                "# Configure Nginx for proxying Jenkins\n",
+                "pushd /etc/nginx/sites-available\n",
+                "  wget https://raw.githubusercontent.com/stelligent/aws-devsecops-workshop/master/provisioning/misc/nginx/jenkins.conf\n",
+                "  rm -f default\n",
+                "popd\n",
+                "\n",
+                "pushd /etc/nginx/sites-enabled\n",
+                "  rm -f default\n",
+                "  ln -s /etc/nginx/sites-available/jenkins.conf ./jenkins",
+                "popd\n",
+                "\n",
+                "# Ensure Nginx is running for proxying Jenkins\n",
+                "service nginx restart\n",
                 "\n",
                 "# Install apache benchmark - Easy Capacity Testing\n",
                 "apt-get install -y apache2-utils\n",

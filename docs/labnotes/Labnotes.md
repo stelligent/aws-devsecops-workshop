@@ -1,12 +1,9 @@
 # AWS DevSecOps Workshop Lab Notes
-## Table of Contents
-[TOC]
-
 ## Section 1: Introduction
 
 ### Learning Objectives
 
-By the end of this workshop, you will haveaws-devsecops-workshop
+By the end of this workshop, you will have
 
 * created a VPC and an EC2 instance running [Jenkins](https://jenkins.io/)
 * be able to run a Jenkins security pipeline job that
@@ -25,7 +22,7 @@ See the [project README](https://github.com/stelligent/blob/master/README.md) fo
 In brief, the only firm requirement is having an active, and ideally empty, AWS account with full access to your AWS profile (the ability to run CloudFormation templates, configure VPCs, create EC2 instances and Internet gateways, etc.)
 
 ### Fork the Project on GitHub
-While the README for this project specifies several methods for 
+While the README for this project specifies several methods for
 In order to allow for customization and testing, you will need to create a copy of the project. In order to do so, you should:
 
 1. Ensure that you have a [GitHub](https://github.com/) account and are signed in to GitHub.
@@ -65,7 +62,7 @@ Take note of the public IP adress of the Jenkins EC2 instance created during thi
 1. Once the initial stack has been created, you will have access to a single EC2 instance running Jenkins. Using the public IP address listed in Section 3->EC2 Instance, direct your web browser to `http://[EC2 public IP]:8080` in order to load the Jenkins login page. <br />![Jenkins login](images/jenkinslogin.png)<br /><br />
 2. Log in to the Jenkins instance using the default username (`workshop`) and password (`Fancy$Treasury!Effective!Throw^6`). You should see a view similar to this: ![Jenkins initial](images/jenkinsinitial.png)<br /><br />
 3. Click the `seed-aws-devops-workshop` link under "Name" in the right-hand table. You should see the following screen. ![Jenkins seed job pre-run](images/jenkinsseedpre.png)<br /><br />
-4. Click "Build Now" in the left-hand menu. 
+4. Click "Build Now" in the left-hand menu.
 5. This pipeline job will run fairly quickly and create a new job entry on the dashboard, "AWS DevSecOps Workshop Pipeline". ![Pipeline list](images/pipelinelist.png)<br /><br />
 6. Click on "AWS DevSecOps Workshop Pipeline".
 7. Click "Build" in the left-hand menu.
@@ -152,4 +149,5 @@ For the purposes of these exercises, the explicit interaction with your forked G
 9. The pipeline should complete successfully. ***However***, *a warning should be triggered in the Commit stage and logged there*.
 	* It may seem confusing, but a pipeline job will not fail on a "WARN" message -- it will only fail if a "FAIL" stage is triggered.
 10. Click on the logs for the Commit stage. Note the warning logged (it should look similar to this): <br /><br />![Commit stage warning](images/cidr-warning.png)<br /><br />
-11. Congratulations! You've now worked through how to add an arbitrary CloudFormation template to the pipeline and have it scanned for security best-practices.
+
+Congratulations! You've now worked through how to add an arbitrary CloudFormation template to the pipeline and have it scanned for security best-practices.
