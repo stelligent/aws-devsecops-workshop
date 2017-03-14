@@ -1,3 +1,3 @@
 ---
-zap_path: /opt/zap/ZAP_2.5.0
+zap_path: /opt/zap/ZAP_2.5.0/zap.sh
 zap_port: 9000
