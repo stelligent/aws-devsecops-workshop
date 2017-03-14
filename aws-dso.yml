@@ -1,0 +1,30 @@
+---
+- hosts: all
+
+  tasks:
+    - name: Ensure ZAP directory exists
+      file:
+        path: /opt/zap
+        state: directory
+        mode: "0755"
+
+    - name: Install OWASP ZAP
+      unarchive:
+        src: https://github.com/zaproxy/zaproxy/releases/download/2.5.0/ZAP_2.5.0_Linux.tar.gz
+        dest: /opt/zap
+        remote_src: True
+
+    - name: Install ZAP init script
+      get_url:
+        url: https://raw.githubusercontent.com/stelligent/zap/master/packer/roles/zap/files/zap-init.sh
+        dest: /etc/init.d/zap
+        mode: "0755"
+
+    - name: Start OWASP ZAP daemon
+      service:
+        name: zap
+        state: started
+        enabled: yes
+
+
+
