@@ -10,6 +10,7 @@
     src: https://github.com/zaproxy/zaproxy/releases/download/2.5.0/ZAP_2.5.0_Linux.tar.gz
     dest: /opt/zap
     remote_src: True
+    creates: /opt/zap/ZAP_2.5.0/zap.sh
 
 - name: Install ZAP init script
   template:
