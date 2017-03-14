@@ -2,8 +2,7 @@
 - hosts: all
 
   roles:
-    - zap
-    - nginx 
+    - "{{ role }}"
 
 
 
