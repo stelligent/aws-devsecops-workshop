@@ -355,17 +355,9 @@
                 "# Perform Ansible Pull\n",
                 "mkdir /tmp/ansible-pull\n",
                 "pushd /tmp/ansible-pull\n",
-                "ansible-pull -U https://github.com/stelligent/aws-devsecops-workshop -C feature/ansible-provision aws-dso.yml"
+                "ansible-pull -U https://github.com/stelligent/aws-devsecops-workshop -C feature/ansible-provision -i'127.0.0.1,' aws-dso.yml"
                 "popd\n",
                 "\n",
-                "# Install Nginx for proxying Jenkins\n",
-                "apt-get update\n",
-                "apt-get install -y nginx\n",
-                "\n",
-                "# Configure Nginx for proxying Jenkins\n",
-                "pushd /etc/nginx/sites-available\n",
-                "  wget https://raw.githubusercontent.com/stelligent/aws-devsecops-workshop/master/provisioning/misc/nginx/jenkins.conf\n",
-                "  rm -f default\n",
                 "popd\n",
                 "\n",
                 "pushd /etc/nginx/sites-enabled\n",

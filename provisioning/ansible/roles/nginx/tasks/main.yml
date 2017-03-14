@@ -1,0 +1,30 @@
+---
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: Ensure Nginx is running
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Remove default Nginx config
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Configure Nginx for proxying Jenkins
+  template:
+    src: etc/nginx/sites-available/jenkins.conf
+    dest: /etc/nginx/sites-available/jenkins.conf
+    mode: "0644"
+
+- name: Enable Jenkins proxy sites
+  file:
+    path: /etc/nginx/sites-enabled/jenkins
+    src: /etc/nginx/sites-available/jenkins.conf
+    state: link
+  notify: restart nginx
