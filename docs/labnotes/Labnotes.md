@@ -117,4 +117,37 @@ For this test, you will need to utilize the fork of the project repository (list
 25. This time, the pipeline should succeed. <br />![Build success](images/buildsuccess2.png)<br /><br />
 26. **OPTIONAL:** Repeat the above steps using the `@production` section instead. Your pipeline should fail at the "Deployment" stage instead of the "Acceptance" one.
 
-Congratulations! You have now demonstrated that you can alter the test conditions for the Acceptance and Production using your personal Github fork of the project.
+Congratulations! You have now demonstrated that you can alter the test conditions for the Acceptance and Production using your personal Github fork of the project. 
+
+## Section 6: Testing Arbitrary CloudFormation Templates
+In this section, we will demonstrate how to test arbitrary CloudFormation templates as a portion of your pipeline. This can act as a useful step for making sure that infrastructure features under development pass the basic best-practices as encapsulated in this pipeline (particularly [CFN Nag](https://github.com/stelligent/cfn_nag)).
+
+For the purposes of these exercises, the explicit interaction with your forked Github repository is considered out of scope, so we will not go into detail on each of the steps.
+
+### Upload an incorrect template
+1. Return to your Github fork of the project.
+2. The DevSecOps pipeline will automatically test files contained in `provisioning/cloudformation/templates/` in the repository.
+3. Using either the web browser or a locally-cloned version of the repository, copy the contents of `provisioning/cloudformation/templates/deployment.json` and commit to the repository. Name it `deploymenttest.json`. <br /><br />![Deployment test JSON](images/deploymenttestjson.png)<br /><br />
+4. Edit the copy and change it to be invalid JSON. For instance, add a spurious semicolon somewhere in-line.
+5. Return to your Jenkins console.
+6. If a pipeline job has not automatically been triggered by the commit to the Github repository, click "Build Now" to attempt a build.
+7. The "Commit" stage of the pipeline should fail with a message about legitimate JSON. This demonstrates that a basic level of JSON parsing is occurring.
+8. Return to the Github repository and remove the extra incorrect character[s] you added above. 
+9. Save the JSON file.
+10. Return to Jenkins and trigger another pipeline job. It should succeed.
+
+### Test for security best-practices
+1. Return to the Github clone. We will be altering our copied CloudFormation template to introduce a security warning.
+	* (For reference's sake, the security tests for CFN Nag are in [stelligent/cfn_nag/blob/master/features/cidr_rules.feature](https://github.com/stelligent/cfn_nag/blob/master/features/cidr_rules.feature))
+2. Under the `Resources` section of the JSON template, introduce a new rule to the `ApplicationSecurityGroup` for inbound SSH. For instance: <br /><br />![SecurityGroup for SSH](images/cidr-closed.png)<br /><br />
+3. Commit the change. Note that the `CidrIp` property is set to match the IP range of the VPC and subnet we created earlier.
+4. Return to the Jenkins console and trigger a pipeline job if one has not already automatically been started. It should succeed as per usual.
+5. If you examine the logs for the "Commit" stage of the pipeline, you should see normal output similar to this:<br /><br />![Normal output](images/correct-failure.png)<br /><br />
+6. Return to Github.
+7. Edit the template's CIDR range to be open to the world.<br /><br />![Open the CIDR wide](images/cidr-wide.png)<br /><br />
+8. Return to Jenkins and trigger a pipeline job.
+9. The pipeline should complete successfully. ***However***, *a warning should be triggered in the Commit stage and logged there*.
+	* It may seem confusing, but a pipeline job will not fail on a "WARN" message -- it will only fail if a "FAIL" stage is triggered.
+10. Click on the logs for the Commit stage. Note the warning logged (it should look similar to this): <br /><br />![Commit stage warning](images/cidr-warning.png)<br /><br />
+
+Congratulations! You've now worked through how to add an arbitrary CloudFormation template to the pipeline and have it scanned for security best-practices.
