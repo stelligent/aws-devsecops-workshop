@@ -1,0 +1,32 @@
+---
+- name: Install Apache Benchmark
+  apt:
+    name: apache2-utils
+    state: present
+
+- name: Set up NodeJS repositories
+  shell: "curl -sL https://deb.nodesource.com/setup_6.x | bash -"
+
+- name: Install NodeJS for config-rules-status
+  apt:
+    name: nodejs
+    state: present
+
+- name: Install serverless packages
+  npm:
+    name: serverless
+    state: present
+    global: yes
+    version: 0.5.5
+
+- name: Install gulp-cli packages
+  npm:
+    name: gulp-cli
+    state: present
+    global: yes
+
+- name: Install AWS CLI via pip
+  pip:
+    name: awscli
+    state: present
+    

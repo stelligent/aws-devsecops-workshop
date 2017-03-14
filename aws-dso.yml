@@ -4,6 +4,7 @@
   roles:
     - zap
     - nginx
+    - tools
 
 
 
