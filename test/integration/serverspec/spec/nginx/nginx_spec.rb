@@ -12,7 +12,7 @@ describe 'Nginx Installation' do
 
   # Correct version of nginx
   describe command('/usr/sbin/nginx -v') do
-    its(:stderr) { should match(%r{nginx version: nginx/1.10.1}) }
+    its(:stderr) { should match(%r{nginx version: nginx/1\.10\.[0-9]+}) }
     its(:exit_status) { should eq 0 }
   end
 
