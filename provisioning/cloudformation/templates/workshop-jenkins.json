@@ -335,6 +335,7 @@
                 {
                   "Ref": "ConfigRulesUser"
                 },
+                "\"\n",
                 "export git_repo_url=\"",
                 {
                   "Ref": "GitRepoUrl"

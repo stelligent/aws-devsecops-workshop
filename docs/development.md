@@ -33,7 +33,8 @@ $ rake jenkins:create
 
 You can include a parameter to specify your VPN CIDR block for a more secure NACL/Security Group configuration:
 
-Limits inbound/outbound traffic to the VPC, Github and your CIDR block.
+Limits inbound/outbound traffic to the VPC, Github and your CIDR block. You can use your own github repo foked from this one. 
+You can change the source reop from `pipeline/jobs/jobdsl.groovy` file to create new set of rules
 ```bash
 $ bundle install
 $ rake jenkins:create['192.0.0.0/24','git-repo-url']
