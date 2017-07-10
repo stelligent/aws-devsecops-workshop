@@ -36,7 +36,7 @@ You can include a parameter to specify your VPN CIDR block for a more secure NAC
 Limits inbound/outbound traffic to the VPC, Github and your CIDR block.
 ```bash
 $ bundle install
-$ rake jenkins:create['192.0.0.0/24']
+$ rake jenkins:create['192.0.0.0/24','git-repo-url']
 ```
 
 ## Updating CloudFormation Templates

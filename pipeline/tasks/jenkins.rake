@@ -10,11 +10,13 @@ region = 'us-east-1' if ENV['AWS_REGION'].nil?
 namespace :jenkins do
   desc 'Create a Workshop VPC + Jenkins'
   # task :create, [:vpc_id, :subnet_id, :world_cidr] do |_, opts|
-  task :create, [:world_cidr] do |_, opts|
+  task :create, [:world_cidr, :gitrepo_url] do |_, opts|
     opts[:world_cidr] = '0.0.0.0/0'
 
     world_cidr = opts[:world_cidr]
+    gitrepo_url = opts[:gitrepo_url]
     world_cidr = '0.0.0.0/0' if world_cidr.nil?
+    gitrepo_url = 'git@github.com:stelligent/aws-devsecops-workshop.git' if gitrepo_url.nil?
 
     # Compile the template
     cfn_template_path = 'provisioning/cloudformation/templates/workshop-jenkins'
@@ -32,6 +34,10 @@ namespace :jenkins do
           {
             parameter_key: 'WorldCIDR',
             parameter_value: world_cidr
+          },
+          {
+            parameter_key: 'GitRepoUrl',
+            parameter_value: gitrepo_url
           }
         ]
       )
