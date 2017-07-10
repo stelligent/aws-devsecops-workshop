@@ -16,6 +16,11 @@
       "Type": "String",
       "Description": "The CIDR block to allow HTTP access to Jenkins with.",
       "Default": "192.30.252.0/22"
+    },
+    "GitRepoUrl": {
+      "Type": "String",
+      "Description": "Your Customized Github Repo aws-devsecops-workshop. Default: git@github.com:stelligent/aws-devsecops-workshop.git",
+      "Default": "git@github.com:stelligent/aws-devsecops-workshop.git"
     }
   },
   "Resources": {
@@ -155,14 +160,6 @@
             "ToPort": "443",
             "CidrIp": {
               "Ref": "WorldCIDR"
-            }
-          },
-          {
-            "IpProtocol": "tcp",
-            "FromPort": "443",
-            "ToPort": "443",
-            "CidrIp": {
-              "Ref": "GithubCIDR"
             }
           },
           {
@@ -339,6 +336,16 @@
                   "Ref": "ConfigRulesUser"
                 },
                 "\"\n",
+                "export git_repo_url=\"",
+                {
+                  "Ref": "GitRepoUrl"
+                },
+                "\"\n",
+                "# Install SSM\n",
+                "mkdir -p /tmp/ssm; cd /tmp/;\n",
+                "wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb\n",
+                "sudo dpkg -i amazon-ssm-agent.deb\n",
+                "sudo start amazon-ssm-agent\n",
                 "#!/bin/bash --login\n",
                 "set -ex\n",
                 "\n",
@@ -425,6 +432,7 @@
                 "sed -i.bak \"s#STACK_NAME_TOKEN#${stack_name}#g\" /var/lib/jenkins/config.xml\n",
                 "sed -i.bak \"s#REGION_TOKEN#${region}#g\" /var/lib/jenkins/config.xml\n",
                 "sed -i.bak \"s#0.0.0.0/0#${world_cidr}#g\" /var/lib/jenkins/config.xml\n",
+                "sed -i.bak \"s#git@github.com:stelligent/aws-devsecops-workshop.git#${git_repo_url}#g\" /var/lib/jenkins/jobs/seed-aws-devsecops-workshop/config.xml\n",
                 "\n",
                 "# Restart Jenkins\n",
                 "service jenkins restart\n",
@@ -467,6 +475,7 @@
           ]
         },
         "Path": "/",
+        "ManagedPolicyArns": ["arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"],
         "Policies": [
           {
             "PolicyName": "aws-devsecops-jenkins-role",
@@ -475,6 +484,11 @@
                 {
                   "Effect": "Allow",
                   "Action": "cloudformation:*",
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "ssm:*",
                   "Resource": "*"
                 },
                 {
