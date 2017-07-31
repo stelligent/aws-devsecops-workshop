@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 ruby '2.2.5'
 
 gem 'aws-sdk'
-gem 'cfn-nag'
+gem 'cfn-nag', '0.1.8'
 gem 'cucumber'
 gem 'eat'
 gem 'english'
