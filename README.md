@@ -34,7 +34,7 @@ aws cloudformation create-stack \
 --region us-east-1 \
 --disable-rollback \
 --capabilities="CAPABILITY_NAMED_IAM" \
---parameters ParameterKey=InstanceType,ParameterValue=t2.micro \
+--parameters ParameterKey=InstanceType,ParameterValue=t2.small \
   ParameterKey=WorldCIDR,ParameterValue=0.0.0.0/0
 ```
 
@@ -58,3 +58,10 @@ The initial admin user to jenkins is preconfigured, the credentials are below.
 
 #### Github
 You'll need to create a [jenkins credential set](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin) to access private repositories in Jenkins.
+
+
+#### Trusted CIDR
+You'll need to set the trusted CIDR in 'deploy.sh'.  This is the source CIDR that will be connecting to jenkins.
+
+#### Egress Rules
+Github, RubyGems, and AWS API Endpoints only traffic allowed out (other than stateful responses).

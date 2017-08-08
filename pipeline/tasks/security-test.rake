@@ -1,16 +1,15 @@
 #!/usr/bin/env ruby
 
-require 'cfn_nag'
+require 'cfn-nag'
 require 'pipeline/inspector'
 require 'pipeline/penetration'
 
 namespace :commit do
   desc 'Static security tests'
   task :security_test do
-    template_path = 'provisioning/cloudformation'
-    failures = CfnNag.new.audit(input_json_path: File.open(template_path),
-                                output_format: 'txt')
-    raise "CFN Nag found #{failures.to_i} issue(s)." if failures > 0
+    cfn_template = 'provisioning/cloudformation/templates/workshop-jenkins.json'
+    failures = CfnNag.new.audit_aggregate_across_files_and_render_results(input_path: File.open(cfn_template))
+    raise "CFN Nag found #{failures} issue(s)." unless failures.to_i.zero?
   end
 end
 

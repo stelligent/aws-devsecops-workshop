@@ -19,3 +19,6 @@ AbcSize:
 
 NumericLiteralPrefix:
   Enabled: false
+
+Metrics/LineLength:
+  Max: 120

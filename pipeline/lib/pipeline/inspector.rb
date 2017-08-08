@@ -61,12 +61,6 @@ module Pipeline
 
       # Clone the repo
       system 'git', 'clone', 'https://github.com/stelligent/inspector-status'
-
-      # No tags on this project yet :-(
-      Dir.chdir('inspector-status') do
-        system 'git', 'reset', '--hard',
-               '08127dbb57b4f419c1eb77b19a588873949b0ebb'
-      end
     end
 
     def run_inspector
@@ -78,7 +72,8 @@ module Pipeline
         system './inspector.rb', '--target-tags', 'InspectorAuditable:true',
                '--aws-name-prefix', 'AWS-DEVSECOPS-WORKSHOP',
                '--failure-metrics', 'numeric_severity:9',
-               '--rules-to-run', 'SEC,COM,RUN,CIS'
+               '--rules-to-run', 'SEC,COM,RUN,CIS',
+               '--asset-duration', '300'
       end
     rescue RuntimeError => errors
       cleanup_inspector

@@ -5,133 +5,149 @@
     "InstanceType": {
       "Type": "String",
       "Description": "EC2 Instance Type to deploy.",
-      "Default": "t2.micro"
+      "Default": "t2.small"
     },
-    "WorldCIDR": {
+    "TrustedCIDR": {
       "Type": "String",
-      "Description": "The CIDR block to allow HTTP access to Jenkins with.",
+      "Description": "The CIDR block to allow SSH/HTTP access to Jenkins from.",
       "Default": "0.0.0.0/0"
+    },
+    "VpcCIDR": {
+      "Type": "String",
+      "Description": "The VPC CIDR block",
+      "Default": "10.0.0.0/16"
+    },
+    "SubnetCIDR": {
+      "Type": "String",
+      "Description": "The VPC CIDR block",
+      "Default": "10.0.0.0/20"
+    },
+    "RubygemsCIDR": {
+      "Type": "String",
+      "Description": "The CIDR block to allow HTTP access from Jenkins to.",
+      "Default": "151.101.0.0/16"
     },
     "GithubCIDR": {
       "Type": "String",
-      "Description": "The CIDR block to allow HTTP access to Jenkins with.",
+      "Description": "The CIDR block to allow HTTP access from Jenkins to.",
       "Default": "192.30.252.0/22"
+    },
+    "AmazonCIDR1": {
+      "Type": "String",
+      "Description": "The Amazon CIDR block.",
+      "Default": "54.224.0.0/12"
+    },
+    "AmazonCIDR2": {
+      "Type": "String",
+      "Description": "The Amazon CIDR block.",
+      "Default": "52.192.0.0/11"
+    },
+    "UbuntuCIDR": {
+      "Type": "String",
+      "Description": "The Amazon CIDR block.",
+      "Default": "0.0.0.0/0"
+    },
+    "JenkinsKeyName": {
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "Description": "Key Pair to use for Jenkins ssh authentication.",
+      "Default": "nando-20170523"
     }
   },
   "Resources": {
-    "InternetGatewayStack": {
-      "Properties": {
-        "TemplateURL": "https://s3.amazonaws.com/aws-devsecops-workshop/workshop-igw.template",
-        "Parameters": {
-          "ParentStackName": {
-            "Ref": "AWS::StackName"
-          },
-          "VPC": {
-            "Ref": "VPC"
-          }
-        },
-        "TimeoutInMinutes": "10"
-      },
-      "Type": "AWS::CloudFormation::Stack"
-    },
     "VPC": {
+      "Type": "AWS::EC2::VPC",
       "Properties": {
-        "CidrBlock": "11.0.0.0/16",
+        "CidrBlock": { "Ref": "VpcCIDR" },
         "EnableDnsSupport": "true",
         "EnableDnsHostnames": "true",
         "Tags": [
           {
             "Key": "Name",
-            "Value": {
-              "Ref": "AWS::StackName"
-            }
+            "Value": { "Ref": "AWS::StackName" }
           }
         ]
-      },
-      "Type": "AWS::EC2::VPC"
+      }
+    },
+    "InternetGateway": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [{
+          "Key": "Name",
+          "Value": { "Ref": "AWS::StackName" }
+        }]
+      }
+    },
+    "InternetGatewayAttach": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": { "Ref": "VPC" },
+        "InternetGatewayId": { "Ref": "InternetGateway" }
+      }
     },
     "Subnet": {
+      "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        },
-        "CidrBlock": "11.0.0.0/20",
+        "VpcId": { "Ref": "VPC" },
+        "CidrBlock": { "Ref": "SubnetCIDR" },
         "MapPublicIpOnLaunch": true,
         "Tags": [
           {
             "Key": "Name",
-            "Value": {
-              "Ref": "AWS::StackName"
-            }
+            "Value": { "Ref": "AWS::StackName" }
           }
         ]
-      },
-      "Type": "AWS::EC2::Subnet"
+      }
     },
     "RouteTable": {
+      "Type": "AWS::EC2::RouteTable",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        },
+        "VpcId": { "Ref": "VPC" },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {
-              "Ref": "AWS::StackName"
-            }
+            "Value": { "Ref": "AWS::StackName" }
           }
         ]
-      },
-      "Type": "AWS::EC2::RouteTable"
+      }
     },
     "Route": {
-      "DependsOn": "InternetGatewayStack",
+      "Type": "AWS::EC2::Route",
       "Properties": {
-        "RouteTableId": {
-          "Ref": "RouteTable"
-        },
-        "DestinationCidrBlock": {
-          "Ref": "WorldCIDR"
-        },
-        "GatewayId": {
-          "Fn::GetAtt" : [ "InternetGatewayStack", "Outputs.Gateway" ]
-        }
-      },
-      "Type": "AWS::EC2::Route"
+        "RouteTableId": { "Ref": "RouteTable" },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": { "Ref": "InternetGateway" }
+      }
     },
     "SubnetAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
-        "SubnetId": {
-          "Ref": "Subnet"
-        },
-        "RouteTableId": {
-          "Ref": "RouteTable"
-        }
-      },
-      "Type": "AWS::EC2::SubnetRouteTableAssociation"
+        "SubnetId": { "Ref": "Subnet" },
+        "RouteTableId": { "Ref": "RouteTable" }
+      }
     },
     "JenkinsSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        },
+        "VpcId": { "Ref": "VPC" },
         "GroupDescription": "AWS DevSecOps Workshop Jenkins",
         "SecurityGroupIngress": [
           {
             "IpProtocol": "tcp",
             "FromPort": "8080",
             "ToPort": "8080",
-            "CidrIp": {
-              "Ref": "WorldCIDR"
-            }
+            "CidrIp": { "Ref": "TrustedCIDR" }
           },
           {
             "IpProtocol": "tcp",
             "FromPort": "80",
             "ToPort": "80",
-            "CidrIp": {
-              "Ref": "WorldCIDR"
-            }
+            "CidrIp": { "Ref": "TrustedCIDR" }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": { "Ref": "TrustedCIDR" }
           }
         ],
         "SecurityGroupEgress": [
@@ -139,82 +155,69 @@
             "IpProtocol": "tcp",
             "FromPort": "22",
             "ToPort": "22",
-            "CidrIp": "11.0.0.0/20"
-          },
-          {
-            "IpProtocol": "tcp",
-            "FromPort": "80",
-            "ToPort": "80",
-            "CidrIp": {
-              "Ref": "WorldCIDR"
-            }
+            "CidrIp": { "Ref": "SubnetCIDR" }
           },
           {
             "IpProtocol": "tcp",
             "FromPort": "443",
             "ToPort": "443",
-            "CidrIp": {
-              "Ref": "WorldCIDR"
-            }
-          },
-          {
-            "IpProtocol": "tcp",
-            "FromPort": "443",
-            "ToPort": "443",
-            "CidrIp": {
-              "Ref": "GithubCIDR"
-            }
-          },
-          {
-            "IpProtocol": "tcp",
-            "FromPort": "80",
-            "ToPort": "80",
-            "CidrIp": {
-              "Ref": "GithubCIDR"
-            }
+            "CidrIp": { "Ref": "RubygemsCIDR" }
           },
           {
             "IpProtocol": "tcp",
             "FromPort": "22",
             "ToPort": "22",
-            "CidrIp": {
-              "Ref": "GithubCIDR"
-            }
+            "CidrIp": { "Ref": "GithubCIDR" }
           },
           {
             "IpProtocol": "tcp",
-            "FromPort": "9418",
-            "ToPort": "9418",
-            "CidrIp": {
-              "Ref": "GithubCIDR"
-            }
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": { "Ref": "GithubCIDR" }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": { "Ref": "AmazonCIDR1" }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": { "Ref": "AmazonCIDR2" }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": { "Ref": "UbuntuCIDR" }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": { "Ref": "UbuntuCIDR" }
           }
         ]
-      },
-      "Type": "AWS::EC2::SecurityGroup"
+      }
     },
     "JenkinsConnector": {
       "Properties": {
         "GroupDescription": "AWS DevSecOps Workshop Jenkins Connector",
-        "VpcId": {
-          "Ref": "VPC"
-        },
+        "VpcId": { "Ref": "VPC" },
         "SecurityGroupIngress": [
           {
             "IpProtocol": "tcp",
             "FromPort": "22",
             "ToPort": "22",
-            "SourceSecurityGroupId": {
-              "Ref": "JenkinsSecurityGroup"
-            }
+            "SourceSecurityGroupId": { "Ref": "JenkinsSecurityGroup" }
           },
           {
             "IpProtocol": "tcp",
             "FromPort": "80",
             "ToPort": "80",
-            "SourceSecurityGroupId": {
-              "Ref": "JenkinsSecurityGroup"
-            }
+            "SourceSecurityGroupId": { "Ref": "JenkinsSecurityGroup" }
           }
         ],
         "SecurityGroupEgress": [
@@ -222,25 +225,19 @@
             "IpProtocol": "tcp",
             "FromPort": "22",
             "ToPort": "22",
-            "DestinationSecurityGroupId": {
-              "Ref": "JenkinsSecurityGroup"
-            }
+            "DestinationSecurityGroupId": { "Ref": "JenkinsSecurityGroup" }
           },
           {
             "IpProtocol": "tcp",
             "FromPort": "80",
             "ToPort": "80",
-            "DestinationSecurityGroupId": {
-              "Ref": "JenkinsSecurityGroup"
-            }
+            "DestinationSecurityGroupId": { "Ref": "JenkinsSecurityGroup" }
           },
           {
             "IpProtocol": "tcp",
             "FromPort": "443",
             "ToPort": "443",
-            "DestinationSecurityGroupId": {
-              "Ref": "JenkinsSecurityGroup"
-            }
+            "DestinationSecurityGroupId": { "Ref": "JenkinsSecurityGroup" }
           }
         ]
       },
@@ -249,39 +246,19 @@
     "WaitHandle": {
       "Type": "AWS::CloudFormation::WaitConditionHandle"
     },
-    "EC2Waiter": {
-      "DependsOn": "JenkinsServer",
-      "Properties": {
-        "Handle": {
-          "Ref": "WaitHandle"
-        },
-        "Timeout": "900"
-      },
-      "Type": "AWS::CloudFormation::WaitCondition"
-    },
     "JenkinsServer": {
-      "DependsOn": "InternetGatewayStack",
       "Properties": {
         "ImageId": "ami-fb5686ed",
-        "InstanceType": {
-          "Ref": "InstanceType"
-        },
-        "IamInstanceProfile": {
-          "Ref": "JenkinsInstanceProfile"
-        },
+        "InstanceType": { "Ref": "InstanceType" },
+        "KeyName": { "Ref": "JenkinsKeyName" },
+        "IamInstanceProfile": { "Ref": "JenkinsInstanceProfile" },
         "NetworkInterfaces": [
           {
             "AssociatePublicIpAddress": true,
             "DeleteOnTermination": true,
-            "SubnetId": {
-              "Ref": "Subnet"
-            },
+            "SubnetId": { "Ref": "Subnet" },
             "DeviceIndex": 0,
-            "GroupSet": [
-              {
-                "Ref": "JenkinsSecurityGroup"
-              }
-            ]
+            "GroupSet": [ { "Ref": "JenkinsSecurityGroup" } ]
           }
         ],
         "Tags": [
@@ -292,6 +269,7 @@
                 " - ",
                 [
                   "AWS DevSecOps Workshop - Jenkins",
+                  { "Ref": "AWS::StackName" },
                   "UBUNTU"
                 ]
               ]
@@ -304,46 +282,24 @@
               "",
               [
                 "#!/bin/bash\n",
-                "export wait_handle=\"",
-                {
-                  "Ref": "WaitHandle"
-                },
-                "\"\n",
-                "export stack_name=\"",
-                {
-                  "Ref": "AWS::StackName"
-                },
-                "\"\n",
-                "export vpc_id=\"",
-                {
-                  "Ref": "VPC"
-                },
-                "\"\n",
-                "export subnet_id=\"",
-                {
-                  "Ref": "Subnet"
-                },
-                "\"\n",
-                "export region=\"",
-                {
-                  "Ref": "AWS::Region"
-                },
-                "\"\n",
-                "export world_cidr=\"",
-                {
-                  "Ref": "WorldCIDR"
-                },
-                "\"\n",
-                "export config_rules_user=\"",
-                {
-                  "Ref": "ConfigRulesUser"
-                },
-                "\"\n",
-                "#!/bin/bash --login\n",
                 "set -ex\n",
-                "\n",
+                "export wait_handle=\"", { "Ref": "WaitHandle" }, "\"\n",
+                "export stack_name=\"", { "Ref": "AWS::StackName" }, "\"\n",
+                "export vpc_id=\"", { "Ref": "VPC" }, "\"\n",
+                "export subnet_id=\"", { "Ref": "Subnet" }, "\"\n",
+                "export region=\"", { "Ref": "AWS::Region" }, "\"\n",
+                "export world_cidr=\"0.0.0.0/0\"\n",
+                "export config_rules_user=\"", { "Ref": "ConfigRulesUser" }, "\"\n",
                 "export HOME=/root\n",
-                "\n",
+                "# Update Jenkins with some build parameters\n",
+                "sed -i.bak \"s#VPCID_TOKEN#${vpc_id}#g\" /var/lib/jenkins/config.xml\n",
+                "sed -i.bak \"s#SUBNETID_TOKEN#${subnet_id}#g\" /var/lib/jenkins/config.xml\n",
+                "sed -i.bak \"s#STACK_NAME_TOKEN#${stack_name}#g\" /var/lib/jenkins/config.xml\n",
+                "sed -i.bak \"s#REGION_TOKEN#${region}#g\" /var/lib/jenkins/config.xml\n",
+                "sed -i.bak \"s#0.0.0.0/0#${world_cidr}#g\" /var/lib/jenkins/config.xml\n",
+                "# Restart Jenkins\n",
+                "service jenkins restart\n",
+                "sleep 30s\n",
                 "# Install ZAP - Penetration Test\n",
                 "mkdir -p /opt/ZAP\n",
                 "pushd /opt/ZAP\n",
@@ -353,44 +309,37 @@
                 "    nohup ./zap.sh -daemon -port 9000 -config api.disablekey=true &\n",
                 "  popd\n",
                 "popd\n",
-                "\n",
                 "# Install Nginx for proxying Jenkins\n",
                 "apt-get update\n",
                 "apt-get install -y nginx\n",
-                "\n",
                 "# Configure Nginx for proxying Jenkins\n",
                 "pushd /etc/nginx/sites-available\n",
                 "  wget https://raw.githubusercontent.com/stelligent/aws-devsecops-workshop/master/provisioning/misc/nginx/jenkins.conf\n",
                 "  rm -f default\n",
                 "popd\n",
-                "\n",
                 "pushd /etc/nginx/sites-enabled\n",
                 "  rm -f default\n",
-                "  ln -s /etc/nginx/sites-available/jenkins.conf ./jenkins",
+                "  ln -fvs /etc/nginx/sites-available/jenkins.conf ./jenkins",
                 "popd\n",
-                "\n",
                 "# Ensure Nginx is running for proxying Jenkins\n",
                 "service nginx restart\n",
-                "\n",
                 "# Install apache benchmark - Easy Capacity Testing\n",
                 "apt-get install -y apache2-utils\n",
-                "\n",
                 "# Install nodejs for config-rules-status\n",
                 "curl -sL https://deb.nodesource.com/setup_6.x | bash -\n",
                 "apt-get install -y nodejs\n",
                 "npm install --global serverless@0.5.5\n",
                 "npm install --global gulp-cli\n",
                 "pip install awscli\n",
-                "\n",
                 "# Install config-rules-status\n",
                 "# Go-go gadget Rube Goldberg machine\n",
                 "chmod 777 /opt\n",
                 "pushd /opt\n",
+                "  rm -rf config-rule-status\n",
                 "  git clone https://github.com/stelligent/config-rule-status.git\n",
                 "  pushd config-rule-status\n",
                 "    # No tags\n",
                 "    git reset --hard \"90e7cb0c6907b05f1a14c2a5093a38dde3f1be2e\"\n",
-                "\n",
                 "    # Requires api access keys :ultimate-sadness:\n",
                 "    aws configure set default.region \"${region}\"\n",
                 "    aws iam create-access-key \\\n",
@@ -402,7 +351,6 @@
                 "    aws configure set aws_secret_access_key \\\n",
                 "      $(cat config_rules_user.json | jq '.AccessKey.SecretAccessKey' -r)\n",
                 "    rm -f config_rules_user.json\n",
-                "\n",
                 "    # Install / run the config-rules-status\n",
                 "    npm install\n",
                 "    gulp init \\\n",
@@ -417,19 +365,6 @@
                 "  popd\n",
                 "  chown -R jenkins:jenkins config-rule-status\n",
                 "popd\n",
-                "\n",
-                "\n",
-                "# Update Jenkins with some build parameters\n",
-                "sed -i.bak \"s#VPCID_TOKEN#${vpc_id}#g\" /var/lib/jenkins/config.xml\n",
-                "sed -i.bak \"s#SUBNETID_TOKEN#${subnet_id}#g\" /var/lib/jenkins/config.xml\n",
-                "sed -i.bak \"s#STACK_NAME_TOKEN#${stack_name}#g\" /var/lib/jenkins/config.xml\n",
-                "sed -i.bak \"s#REGION_TOKEN#${region}#g\" /var/lib/jenkins/config.xml\n",
-                "sed -i.bak \"s#0.0.0.0/0#${world_cidr}#g\" /var/lib/jenkins/config.xml\n",
-                "\n",
-                "# Restart Jenkins\n",
-                "service jenkins restart\n",
-                "sleep 30s\n",
-                "\n",
                 "# Create the CloudFormation wait handle JSON\n",
                 "cat > /tmp/cfn-success <<CFNSUCCESS\n",
                 "{\n",
@@ -439,7 +374,6 @@
                 "   \"Data\" : \"Application has completed configuration.\"\n",
                 "}\n",
                 "CFNSUCCESS\n",
-                "\n",
                 "# Emit success to CloudFormation\n",
                 "curl -T /tmp/cfn-success \"${wait_handle}\"\n"
               ]
@@ -450,19 +384,16 @@
       "Type": "AWS::EC2::Instance"
     },
     "JenkinsRole": {
+      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
               "Effect": "Allow",
               "Principal": {
-                "Service": [
-                  "ec2.amazonaws.com"
-                ]
+                "Service": [ "ec2.amazonaws.com" ]
               },
-              "Action": [
-                "sts:AssumeRole"
-              ]
+              "Action": [ "sts:AssumeRole" ]
             }
           ]
         },
@@ -474,73 +405,93 @@
               "Statement": [
                 {
                   "Effect": "Allow",
-                  "Action": "cloudformation:*",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "ec2:*",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "inspector:*",
+                  "Action": [
+                    "cloudformation:CreateStack",
+                    "cloudformation:DescribeStacks",
+                    "cloudformation:DescribeStackResource",
+                    "cloudformation:UpdateStack",
+                    "cloudtrail:DescribeTrails",
+                    "cloudtrail:GetTrailStatus",
+                    "cloudtrail:LookupEvents",
+                    "ec2:AuthorizeSecurityGroupIngress",
+                    "ec2:AuthorizeSecurityGroupEgress",
+                    "ec2:CreateKeyPair",
+                    "ec2:createTags",
+                    "ec2:CreateSecurityGroup",
+                    "ec2:DescribeKeyPairs",
+                    "ec2:DescribeSecurityGroups",
+                    "ec2:DescribeSubnets",
+                    "ec2:DescribeImages",
+                    "ec2:DescribeInstances",
+                    "ec2:DescribeVpcs",
+                    "ec2:RevokeSecurityGroupEgress",
+                    "ec2:RunInstances",
+                    "ec2:DeleteSecurityGroup",
+                    "ec2:TerminateInstances",
+                    "config:DescribeComplianceByConfigRule",
+                    "config:DescribeComplianceByResource",
+                    "config:DescribeConfigRuleEvaluationStatus",
+                    "config:DescribeConfigRules",
+                    "config:DescribeConfigurationRecorders",
+                    "config:DescribeConfigurationRecorderStatus",
+                    "config:DescribeDeliveryChannels",
+                    "config:DescribeDeliveryChannelStatus",
+                    "config:GetComplianceDetailsByConfigRule",
+                    "config:GetComplianceDetailsByResource",
+                    "config:GetComplianceSummaryByConfigRule",
+                    "config:GetComplianceSummaryByResourceType",
+                    "config:GetResourceConfigHistory",
+                    "config:GetResources",
+                    "config:GetTagKeys",
+                    "config:ListDiscoveredResources",
+                    "config:DeliverConfigSnapshot",
+                    "inspector:CreateResourceGroup",
+                    "inspector:CreateAssessmentTarget",
+                    "inspector:CreateAssessmentTemplate",
+                    "inspector:DescribeAssessmentRuns",
+                    "inspector:DescribeCrossAccountAccessRole",
+                    "inspector:DescribeFindings",
+                    "inspector:DescribeRulesPackages",
+                    "inspector:ListRulesPackages",
+                    "inspector:ListFindings",
+                    "inspector:StartAssessmentRun",
+                    "inspector:StopAssessmentRun",
+                    "inspector:DeleteAssessmentRun",
+                    "inspector:DeleteAssessmentTarget",
+                    "inspector:DeleteAssessmentTemplate",
+                    "tag:GetResources",
+                    "tag:GetTagKeys"
+                  ],
                   "Resource": "*"
                 },
                 {
                   "Effect": "Allow",
                   "Action": "iam:CreateAccessKey",
-                  "Resource": {
-                    "Fn::GetAtt": [
-                      "ConfigRulesUser",
-                      "Arn"
-                    ]
-                  }
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "config:*",
-                  "Resource": "*"
+                  "Resource": { "Fn::GetAtt": [ "ConfigRulesUser", "Arn" ] }
                 }
               ]
             }
           }
         ]
-      },
-      "Type": "AWS::IAM::Role"
+      }
     },
     "JenkinsInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
       "Properties": {
         "Path": "/",
-        "Roles": [
-          {
-            "Ref": "JenkinsRole"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::InstanceProfile"
+        "Roles": [ { "Ref": "JenkinsRole" } ]
+      }
     },
     "InspectorRole": {
+      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
               "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "inspector.amazonaws.com"
-                ]
-              },
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Condition": {
-                "StringEquals": {
-                  "sts:ExternalId": {
-                    "Ref": "AWS::AccountId"
-                  }
-                }
-              }
+              "Principal": { "Service": [ "inspector.amazonaws.com" ] },
+              "Action": [ "sts:AssumeRole" ],
+              "Condition": { "StringEquals": { "sts:ExternalId": { "Ref": "AWS::AccountId" } } }
             }
           ]
         },
@@ -559,14 +510,12 @@
             }
           }
         ]
-      },
-      "Type": "AWS::IAM::Role"
+      }
     },
     "ConfigRulesGroup": {
+      "Type": "AWS::IAM::Group",
       "Properties": {
-        "GroupName": {
-          "Ref": "AWS::StackName"
-        },
+        "GroupName": { "Ref": "AWS::StackName" },
         "Policies": [
           {
             "PolicyName": "aws-devsecops-configrules-policy",
@@ -574,88 +523,53 @@
               "Statement": [
                 {
                   "Effect": "Allow",
-                  "Action": "s3:*",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "cloudformation:*",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "lambda:*",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "iam:*",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "apigateway:*",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "kinesis:*",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "sqs:*",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "sns:*",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "config:*",
-                  "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "events:*",
+                  "Action": [
+                    "s3:*",
+                    "cloudformation:*",
+                    "lambda:*",
+                    "iam:*",
+                    "apigateway:*",
+                    "kinesis:*",
+                    "sqs:*",
+                    "sns:*",
+                    "config:*",
+                    "events:*",
+                    "inspector:*"
+                  ],
                   "Resource": "*"
                 }
               ]
             }
           }
         ]
-      },
-      "Type": "AWS::IAM::Group"
+      }
     },
     "ConfigRulesUser": {
+      "Type": "AWS::IAM::User",
       "Properties": {
         "Groups": [
-          {
-            "Ref": "ConfigRulesGroup"
-          }
+          { "Ref": "ConfigRulesGroup" }
         ]
-      },
-      "Type": "AWS::IAM::User"
+      }
+    },
+    "JenkinsDNS" : {
+      "Type" : "AWS::Route53::RecordSet",
+      "Properties" : {
+         "HostedZoneName" : "elasticoperations.com.",
+         "Comment" : "DNS record for DevSecOps Pipeline.",
+         "Name" : "devsecops.elasticoperations.com.",
+         "Type" : "A",
+         "TTL" : "60",
+         "ResourceRecords" : [
+            { "Fn::GetAtt" : [ "JenkinsServer", "PublicIp" ] }
+         ]
+      }
     }
   },
   "Outputs": {
-    "JenkinsIP": {
-      "Value": {
-        "Fn::GetAtt": [
-          "JenkinsServer",
-          "PublicIp"
-        ]
-      }
-    },
-    "InspectorRoleArn": {
-      "Value": {
-        "Fn::GetAtt": [
-          "InspectorRole",
-          "Arn"
-        ]
-      }
-    }
+    "InstanceID" : { "Value" : { "Ref" : "JenkinsServer" } },
+    "SecurityGroup": { "Value": { "Ref": "JenkinsSecurityGroup" } },
+    "JenkinsIP": { "Value": { "Fn::GetAtt": [ "JenkinsServer", "PublicIp" ] } },
+    "InspectorRoleArn": { "Value": { "Fn::GetAtt": [ "InspectorRole", "Arn" ] } }
   }
 }
