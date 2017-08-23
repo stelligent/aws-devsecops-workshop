@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'aws-sdk'
 require 'pipeline/cfn_helper'
 

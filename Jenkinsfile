@@ -42,11 +42,6 @@ node('master') {
 
           // Security / Integration Tests
           rake 'acceptance:security_test'
-
-          // Security / Config Rules Tests
-          dir('/opt/config-rule-status') {
-            sh "echo '{}' | gulp verify --stage prod --region ${region}"
-          }
         }
       }
 

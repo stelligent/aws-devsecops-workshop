@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 namespace :commit do
   desc 'Static analysis tests'
   task static_analysis: [:rubocop]

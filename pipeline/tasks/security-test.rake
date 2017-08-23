@@ -1,8 +1,7 @@
-#!/usr/bin/env ruby
-
 require 'cfn-nag'
 require 'pipeline/inspector'
 require 'pipeline/penetration'
+require 'pipeline/configservice'
 
 namespace :commit do
   desc 'Static security tests'
@@ -15,7 +14,12 @@ end
 
 namespace :acceptance do
   desc 'Integration security tests'
-  task security_test: [:'acceptance:inspector']
+  task security_test: %i[acceptance:configservice acceptance:inspector]
+
+  desc 'Config Rule tests'
+  task :configservice do
+    Pipeline::ConfigService.new
+  end
 
   desc 'Execute AWS Inspector tests'
   task :inspector do

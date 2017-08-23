@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'aws-sdk'
 require 'json'
 require 'pipeline/cfn_helper'
@@ -10,8 +8,7 @@ module Pipeline
   # Class for handling inspector tests
   class Penetration < CloudFormationHelper
     def initialize
-      @cloudformation = Aws::CloudFormation::Client
-                        .new(region: aws_region)
+      @cloudformation = Aws::CloudFormation::Client.new(region: aws_region)
 
       penetration_test
     end
@@ -24,6 +21,7 @@ module Pipeline
     def results
       result_output = JSON.parse(File.read('results.json'))
 
+      puts("\n\n=== Penetration Testing Report ===\n\n")
       result_output.each do |issue|
         puts "#{issue['risk']}: #{issue['alert']}"
         puts "Description: #{issue['description']}"

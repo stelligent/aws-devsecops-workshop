@@ -1,20 +1,36 @@
 #!/bin/bash
 
-PROFILE="stell"
-STACK_NAME="AWS-DEVSECOPS-WORKSHOP-JENKINS"
-TRUSTED_CIDR="0.0.0.0/0"
+if [ -z ${TRUSTED_CIDR} ]; then
+  echo -e "\n\nPlease export TRUSTED_CIRD. Example: '0.0.0.0/0'\n\n"
+  exit 1
+fi
+if [ -z ${SSH_KEY_NAME} ]; then
+  echo -e "\n\nPlease export SSH_KEY_NAME. Example: 'my-ec2-keypair'\n\n"
+  exit 1
+fi
+if [ -z ${TOP_LEVEL_DOMAIN} ]; then
+  echo -e "\n\nPlease export TOP_LEVEL_DOMAIN with trailing dot."
+  echo -e "The Top Level Domain must be hosted in the account in which this stack is being launched."
+  echo -e "Example: 'example.com.'\n\n"
+  exit 1
+fi
 
+
+INSTANCE_TYPE="t2.small"
+STACK_NAME="AWS-DEVSECOPS-WORKSHOP-JENKINS"
 
 if [ $# -gt 0 ]; then
   case "$1" in
     update)
       echo -e "\n\nUpdating DevSecOps Workshop Stack:\n\n"
       aws cloudformation update-stack \
-        --profile ${PROFILE} \
         --stack-name ${STACK_NAME} \
         --template-body file://./provisioning/cloudformation/templates/workshop-jenkins.json \
         --capabilities CAPABILITY_NAMED_IAM \
-        --parameters ParameterKey=InstanceType,ParameterValue=t2.small \
+        --parameters \
+          ParameterKey=InstanceType,ParameterValue=${INSTANCE_TYPE} \
+          ParameterKey=TopLevelDomain,ParameterValue=${TOP_LEVEL_DOMAIN} \
+          ParameterKey=JenkinsKeyName,ParameterValue=${SSH_KEY_NAME} \
           ParameterKey=TrustedCIDR,ParameterValue=${TRUSTED_CIDR}
       ;;
     delete)
@@ -42,11 +58,13 @@ if [ $# -gt 0 ]; then
 else
   echo -e "\n\nDeploying DevSecOps Workshop Stack:\n\n"
   aws cloudformation create-stack \
-    --profile ${PROFILE} \
     --stack-name ${STACK_NAME} \
     --template-body file://./provisioning/cloudformation/templates/workshop-jenkins.json \
     --disable-rollback \
     --capabilities CAPABILITY_NAMED_IAM \
-    --parameters ParameterKey=InstanceType,ParameterValue=t2.small \
+    --parameters \
+      ParameterKey=InstanceType,ParameterValue=${INSTANCE_TYPE} \
+      ParameterKey=TopLevelDomain,ParameterValue=${TOP_LEVEL_DOMAIN} \
+      ParameterKey=JenkinsKeyName,ParameterValue=${SSH_KEY_NAME} \
       ParameterKey=TrustedCIDR,ParameterValue=${TRUSTED_CIDR}
 fi

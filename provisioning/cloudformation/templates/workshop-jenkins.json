@@ -15,12 +15,12 @@
     "VpcCIDR": {
       "Type": "String",
       "Description": "The VPC CIDR block",
-      "Default": "10.0.0.0/16"
+      "Default": "172.31.255.0/24"
     },
     "SubnetCIDR": {
       "Type": "String",
       "Description": "The VPC CIDR block",
-      "Default": "10.0.0.0/20"
+      "Default": "172.31.255.0/25"
     },
     "RubygemsCIDR": {
       "Type": "String",
@@ -47,13 +47,28 @@
       "Description": "The Amazon CIDR block.",
       "Default": "0.0.0.0/0"
     },
+    "TopLevelDomain": {
+      "Type": "String",
+      "Description": "The top level domain to add route53 entry to. This varies by account. Default is for stell-labs account.",
+      "Default": "elasticoperations.com."
+    },
     "JenkinsKeyName": {
       "Type": "AWS::EC2::KeyPair::KeyName",
-      "Description": "Key Pair to use for Jenkins ssh authentication.",
-      "Default": "nando-20170523"
+      "Description": "Key Pair to use for Jenkins ssh authentication."
     }
   },
   "Resources": {
+    "InternetGatewayStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/aws-devsecops-workshop/workshop-igw.template",
+        "Parameters": {
+          "ParentStackName": { "Ref": "AWS::StackName" },
+          "VPC": { "Ref": "VPC" }
+        },
+        "TimeoutInMinutes": "10"
+      }
+    },
     "VPC": {
       "Type": "AWS::EC2::VPC",
       "Properties": {
@@ -66,22 +81,6 @@
             "Value": { "Ref": "AWS::StackName" }
           }
         ]
-      }
-    },
-    "InternetGateway": {
-      "Type": "AWS::EC2::InternetGateway",
-      "Properties": {
-        "Tags": [{
-          "Key": "Name",
-          "Value": { "Ref": "AWS::StackName" }
-        }]
-      }
-    },
-    "InternetGatewayAttach": {
-      "Type": "AWS::EC2::VPCGatewayAttachment",
-      "Properties": {
-        "VpcId": { "Ref": "VPC" },
-        "InternetGatewayId": { "Ref": "InternetGateway" }
       }
     },
     "Subnet": {
@@ -112,10 +111,11 @@
     },
     "Route": {
       "Type": "AWS::EC2::Route",
+      "DependsOn": "InternetGatewayStack",
       "Properties": {
         "RouteTableId": { "Ref": "RouteTable" },
         "DestinationCidrBlock": "0.0.0.0/0",
-        "GatewayId": { "Ref": "InternetGateway" }
+        "GatewayId": { "Fn::GetAtt" : [ "InternetGatewayStack", "Outputs.Gateway" ] }
       }
     },
     "SubnetAssociation": {
@@ -203,6 +203,7 @@
       }
     },
     "JenkinsConnector": {
+      "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
         "GroupDescription": "AWS DevSecOps Workshop Jenkins Connector",
         "VpcId": { "Ref": "VPC" },
@@ -240,13 +241,22 @@
             "DestinationSecurityGroupId": { "Ref": "JenkinsSecurityGroup" }
           }
         ]
-      },
-      "Type": "AWS::EC2::SecurityGroup"
+      }
     },
     "WaitHandle": {
       "Type": "AWS::CloudFormation::WaitConditionHandle"
     },
+    "JenkinsWaiter": {
+      "Type": "AWS::CloudFormation::WaitCondition",
+      "DependsOn": "JenkinsServer",
+      "Properties": {
+        "Handle": { "Ref": "WaitHandle" },
+        "Timeout": "900"
+      }
+    },
     "JenkinsServer": {
+      "Type": "AWS::EC2::Instance",
+      "DependsOn": "InternetGatewayStack",
       "Properties": {
         "ImageId": "ami-fb5686ed",
         "InstanceType": { "Ref": "InstanceType" },
@@ -289,7 +299,6 @@
                 "export subnet_id=\"", { "Ref": "Subnet" }, "\"\n",
                 "export region=\"", { "Ref": "AWS::Region" }, "\"\n",
                 "export world_cidr=\"0.0.0.0/0\"\n",
-                "export config_rules_user=\"", { "Ref": "ConfigRulesUser" }, "\"\n",
                 "export HOME=/root\n",
                 "# Update Jenkins with some build parameters\n",
                 "sed -i.bak \"s#VPCID_TOKEN#${vpc_id}#g\" /var/lib/jenkins/config.xml\n",
@@ -311,7 +320,7 @@
                 "popd\n",
                 "# Install Nginx for proxying Jenkins\n",
                 "apt-get update\n",
-                "apt-get install -y nginx\n",
+                "apt-get install -y nginx python-dev\n",
                 "# Configure Nginx for proxying Jenkins\n",
                 "pushd /etc/nginx/sites-available\n",
                 "  wget https://raw.githubusercontent.com/stelligent/aws-devsecops-workshop/master/provisioning/misc/nginx/jenkins.conf\n",
@@ -325,46 +334,8 @@
                 "service nginx restart\n",
                 "# Install apache benchmark - Easy Capacity Testing\n",
                 "apt-get install -y apache2-utils\n",
-                "# Install nodejs for config-rules-status\n",
-                "curl -sL https://deb.nodesource.com/setup_6.x | bash -\n",
                 "apt-get install -y nodejs\n",
-                "npm install --global serverless@0.5.5\n",
-                "npm install --global gulp-cli\n",
-                "pip install awscli\n",
-                "# Install config-rules-status\n",
-                "# Go-go gadget Rube Goldberg machine\n",
-                "chmod 777 /opt\n",
-                "pushd /opt\n",
-                "  rm -rf config-rule-status\n",
-                "  git clone https://github.com/stelligent/config-rule-status.git\n",
-                "  pushd config-rule-status\n",
-                "    # No tags\n",
-                "    git reset --hard \"90e7cb0c6907b05f1a14c2a5093a38dde3f1be2e\"\n",
-                "    # Requires api access keys :ultimate-sadness:\n",
-                "    aws configure set default.region \"${region}\"\n",
-                "    aws iam create-access-key \\\n",
-                "      --region \"${region}\" \\\n",
-                "      --user-name \"${config_rules_user}\" \\\n",
-                "      --output json > config_rules_user.json\n",
-                "    aws configure set aws_access_key_id \\\n",
-                "      $(cat config_rules_user.json | jq '.AccessKey.AccessKeyId' -r)\n",
-                "    aws configure set aws_secret_access_key \\\n",
-                "      $(cat config_rules_user.json | jq '.AccessKey.SecretAccessKey' -r)\n",
-                "    rm -f config_rules_user.json\n",
-                "    # Install / run the config-rules-status\n",
-                "    npm install\n",
-                "    gulp init \\\n",
-                "      --region \"${region}\" \\\n",
-                "      --stage prod \\\n",
-                "      --name \"AWS-DEVSECOPS-WORKSHOP-$(uuidgen | cut -d- -f1)\" \\\n",
-                "      --awsProfile default \\\n",
-                "      --email no-reply@stelligent.com\n",
-                "    gulp build\n",
-                "    gulp deploy:lambda --stage prod --region \"${region}\"\n",
-                "    gulp deploy:config --stage prod --region \"${region}\"\n",
-                "  popd\n",
-                "  chown -R jenkins:jenkins config-rule-status\n",
-                "popd\n",
+                "pip install --upgrade awscli\n",
                 "# Create the CloudFormation wait handle JSON\n",
                 "cat > /tmp/cfn-success <<CFNSUCCESS\n",
                 "{\n",
@@ -380,8 +351,7 @@
             ]
           }
         }
-      },
-      "Type": "AWS::EC2::Instance"
+      }
     },
     "JenkinsRole": {
       "Type": "AWS::IAM::Role",
@@ -437,6 +407,7 @@
                     "config:DescribeConfigurationRecorderStatus",
                     "config:DescribeDeliveryChannels",
                     "config:DescribeDeliveryChannelStatus",
+                    "config:GetDiscoveredResourceCounts",
                     "config:GetComplianceDetailsByConfigRule",
                     "config:GetComplianceDetailsByResource",
                     "config:GetComplianceSummaryByConfigRule",
@@ -464,11 +435,6 @@
                     "tag:GetTagKeys"
                   ],
                   "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": "iam:CreateAccessKey",
-                  "Resource": { "Fn::GetAtt": [ "ConfigRulesUser", "Arn" ] }
                 }
               ]
             }
@@ -483,82 +449,12 @@
         "Roles": [ { "Ref": "JenkinsRole" } ]
       }
     },
-    "InspectorRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": { "Service": [ "inspector.amazonaws.com" ] },
-              "Action": [ "sts:AssumeRole" ],
-              "Condition": { "StringEquals": { "sts:ExternalId": { "Ref": "AWS::AccountId" } } }
-            }
-          ]
-        },
-        "Path": "/",
-        "Policies": [
-          {
-            "PolicyName": "aws-devsecops-inspector-role",
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Action": "ec2:DescribeInstances",
-                  "Resource": "*"
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
-    "ConfigRulesGroup": {
-      "Type": "AWS::IAM::Group",
-      "Properties": {
-        "GroupName": { "Ref": "AWS::StackName" },
-        "Policies": [
-          {
-            "PolicyName": "aws-devsecops-configrules-policy",
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Action": [
-                    "s3:*",
-                    "cloudformation:*",
-                    "lambda:*",
-                    "iam:*",
-                    "apigateway:*",
-                    "kinesis:*",
-                    "sqs:*",
-                    "sns:*",
-                    "config:*",
-                    "events:*",
-                    "inspector:*"
-                  ],
-                  "Resource": "*"
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
-    "ConfigRulesUser": {
-      "Type": "AWS::IAM::User",
-      "Properties": {
-        "Groups": [
-          { "Ref": "ConfigRulesGroup" }
-        ]
-      }
-    },
     "JenkinsDNS" : {
       "Type" : "AWS::Route53::RecordSet",
       "Properties" : {
-         "HostedZoneName" : "elasticoperations.com.",
+         "HostedZoneName" : { "Ref": "TopLevelDomain" },
          "Comment" : "DNS record for DevSecOps Pipeline.",
-         "Name" : "devsecops.elasticoperations.com.",
+         "Name" : { "Fn::Join": [ ".", [ "devsecops", { "Ref": "TopLevelDomain" } ] ] },
          "Type" : "A",
          "TTL" : "60",
          "ResourceRecords" : [
@@ -570,7 +466,7 @@
   "Outputs": {
     "InstanceID" : { "Value" : { "Ref" : "JenkinsServer" } },
     "SecurityGroup": { "Value": { "Ref": "JenkinsSecurityGroup" } },
-    "JenkinsIP": { "Value": { "Fn::GetAtt": [ "JenkinsServer", "PublicIp" ] } },
-    "InspectorRoleArn": { "Value": { "Fn::GetAtt": [ "InspectorRole", "Arn" ] } }
+    "JenkinsDNS": { "Value": { "Ref": "JenkinsDNS" } },
+    "JenkinsIP": { "Value": { "Fn::GetAtt": [ "JenkinsServer", "PublicIp" ] } }
   }
 }

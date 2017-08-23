@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 namespace :commit do
   desc 'Unit tests'
   task :unit_test do
