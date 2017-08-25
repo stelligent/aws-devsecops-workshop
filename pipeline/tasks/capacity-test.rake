@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'pipeline/capacity'
 
 namespace :capacity do

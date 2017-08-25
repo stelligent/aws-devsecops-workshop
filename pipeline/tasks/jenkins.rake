@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'aws-sdk'
 
 region = ENV['AWS_REGION'] unless ENV['AWS_REGION'].nil?
@@ -26,7 +24,7 @@ namespace :jenkins do
       @cloudformation.create_stack(
         stack_name: @stack_name,
         template_body: cfn_template,
-        capabilities: %w(CAPABILITY_IAM CAPABILITY_NAMED_IAM),
+        capabilities: %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM],
         disable_rollback: true,
         parameters: [
           {

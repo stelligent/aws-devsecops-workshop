@@ -1,6 +1,3 @@
-#!/usr/bin/env ruby
-
-require 'aws-sdk'
 require 'fileutils'
 
 module Pipeline
@@ -10,52 +7,13 @@ module Pipeline
       @params = params
       @params[:region] = ENV['AWS_REGION']
       @params[:region] ||= 'us-east-1'
-      @cloudformation = Aws::CloudFormation::Client
-                        .new(region: @params[:region])
-      @inspector = Aws::Inspector::Client.new(region: @params[:region])
 
-      setup_inspector
+      clone_inspector
       run_inspector
       cleanup_inspector
     end
 
-    def setup_inspector
-      clone
-      configure_iam
-    end
-
-    def configure_iam
-      configure_inspector_role unless inspector_role_configured?
-    end
-
-    def inspector_role_configured?
-      role = @inspector.describe_cross_account_access_role
-
-      !role.role_arn.empty? && role.valid
-    rescue NoMethodError
-      false
-    end
-
-    def configure_inspector_role
-      @inspector.register_cross_account_access_role(
-        role_arn: inspector_role_arn
-      )
-
-      # It takes a moment for validation
-      sleep 30
-    end
-
-    def inspector_role_arn
-      stack = @cloudformation.describe_stacks(
-        stack_name: ENV['STACK_NAME']
-      ).stacks.first
-
-      stack.outputs.each do |output|
-        return output.output_value if output.output_key == 'InspectorRoleArn'
-      end
-    end
-
-    def clone
+    def clone_inspector
       # Ensure a clean slate
       cleanup_inspector
 
@@ -64,9 +22,9 @@ module Pipeline
     end
 
     def run_inspector
-      # This is required for inspector -- weird
       ENV['AWS_REGION'] ||= 'us-east-1'
 
+      puts("\n\n=== AWS Inspector Report ===\n\n")
       Dir.chdir('inspector-status') do
         system 'bundle', 'install'
         system './inspector.rb', '--target-tags', 'InspectorAuditable:true',

@@ -60,8 +60,13 @@ The initial admin user to jenkins is preconfigured, the credentials are below.
 You'll need to create a [jenkins credential set](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin) to access private repositories in Jenkins.
 
 
-#### Trusted CIDR
-You'll need to set the trusted CIDR in 'deploy.sh'.  This is the source CIDR that will be connecting to jenkins.
+#### Deployment script
+you can optionally use `deploy.sh` to control stack. if you do so, these variables must be personalized at top of file:
+```
+PROFILE  # the aws profile to launch cfn with
+TRUSTED_CIDR  # the source CIDR that will be connecting to jenkins.
+SSH_KEY_NAME  # the ssh key to use for the jenkins server
+```
 
 #### Egress Rules
 Github, RubyGems, and AWS API Endpoints only traffic allowed out (other than stateful responses).

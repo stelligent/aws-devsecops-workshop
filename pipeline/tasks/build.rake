@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 namespace :commit do
   desc 'Build application'
   task :build do

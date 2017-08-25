@@ -1,11 +1,9 @@
-#!/usr/bin/env ruby
-
 require 'rspec/core/rake_task'
 require 'cucumber/rake/task'
 
 namespace :acceptance do
   desc 'Integration test the acceptance environment'
-  task integration_test: [:'acceptance:serverspec', :'acceptance:cucumber']
+  task integration_test: %i[acceptance:serverspec acceptance:cucumber]
 
   desc 'Integration tests for server configuration'
   RSpec::Core::RakeTask.new(:serverspec) do |t|

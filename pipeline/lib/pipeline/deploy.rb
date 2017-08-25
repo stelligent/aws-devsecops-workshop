@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'aws-sdk'
 require 'eat'
 require 'pipeline/state'

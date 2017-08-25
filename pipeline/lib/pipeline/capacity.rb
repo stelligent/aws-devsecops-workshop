@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'aws-sdk'
 require 'json'
 require 'pipeline/cfn_helper'
@@ -22,7 +20,8 @@ module Pipeline
     end
 
     def results
-      puts File.read('capacity_result.txt')
+      puts("\n\n=== Capacity Testing Reports ===\n\n")
+      puts(File.read('capacity_result.txt'))
       system 'cucumber features/capacity_test.feature'
     end
 

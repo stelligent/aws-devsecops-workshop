@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 $LOAD_PATH << './pipeline/lib'
 
 require 'serverspec'
