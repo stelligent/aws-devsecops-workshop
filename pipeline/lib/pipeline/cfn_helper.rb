@@ -61,7 +61,7 @@ module Pipeline
                        .key_pairs.empty?
       aws_check && File.exist?(key_path)
     rescue Aws::EC2::Errors::InvalidKeyPairNotFound
-      return false
+      false
     end
 
     def delete_old_keypair(key_path)
@@ -75,9 +75,9 @@ module Pipeline
 
     def stack_exists
       @cloudformation.describe_stacks(stack_name: stack_name)
-      return true
+      true
     rescue Aws::CloudFormation::Errors::ValidationError
-      return false
+      false
     end
 
     def connector_sg
