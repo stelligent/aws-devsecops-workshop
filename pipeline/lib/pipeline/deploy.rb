@@ -9,10 +9,8 @@ module Pipeline
   class Deploy < CloudFormationHelper
     def initialize(params = {})
       @params = params
-      @cloudformation = Aws::CloudFormation::Client
-                        .new(region: aws_region)
+      @cloudformation = Aws::CloudFormation::Client.new(region: aws_region)
       @ec2 = Aws::EC2::Client.new(region: aws_region)
-
       deploy
     end
 
@@ -33,12 +31,11 @@ module Pipeline
 
     def stack_parameters
       [
-        parameter('VPCID', ENV['VPCID']),
-        parameter('SubnetId', ENV['SubnetId']),
+        parameter('VPCID', File.read('/var/lib/jenkins/jenkins_vpc_id').strip),
+        parameter('SubnetId', File.read('/var/lib/jenkins/jenkins_subnet_id').strip),
         parameter('KeyPairName', keypair),
         parameter('Environment', @params[:environment]),
-        parameter('JenkinsConnectorSG', connector_sg),
-        parameter('WorldCIDR', ENV['WorldCIDR']),
+        parameter('WorldCIDR', '0.0.0.0/0'),
         parameter('UUID', `uuidgen`.strip!)
       ]
     end
@@ -67,18 +64,14 @@ module Pipeline
     end
 
     def public_ip
-      stack = @cloudformation.describe_stacks(stack_name: stack_name)
-                             .stacks.first
-
+      stack = @cloudformation.describe_stacks(stack_name: stack_name).stacks.first
       stack.outputs.each do |output|
         return output.output_value if output.output_key == 'EC2PublicIP'
       end
     end
 
     def private_ip
-      stack = @cloudformation.describe_stacks(stack_name: stack_name)
-                             .stacks.first
-
+      stack = @cloudformation.describe_stacks(stack_name: stack_name).stacks.first
       stack.outputs.each do |output|
         return output.output_value if output.output_key == 'EC2PrivateIP'
       end

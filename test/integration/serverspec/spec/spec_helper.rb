@@ -12,4 +12,4 @@ set :backend, :ssh
 set :host, target_host
 set :ssh_options, Net::SSH::Config
   .for(target_host)
-  .merge(user: 'ec2-user', keys: keypair_path, paranoid: false)
+  .merge(user: 'ec2-user', keys: keypair_path, verify_host_key: :accept_new)

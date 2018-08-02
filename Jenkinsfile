@@ -3,101 +3,76 @@
 node('master') {
   try {
       stage('Commit') {
-        withRvm {
-          // Checkout SCM
-          checkout scm
+        // Checkout SCM
+        checkout scm
 
+        withEnv(['PATH=/sbin:/usr/sbin:/bin:/usr/bin:/var/lib/jenkins/bin:/usr/local/bin']) {
           // Configure Workspace
           sh 'which bundle || gem install bundler'
           sh 'bundle install'
+          sh 'bundle info cfn-nag | grep Path | cut -f2 -d" " > cfn-nag.path'
 
           // Build
-          rake 'commit:build'
+          sh 'rake commit:build'
 
           // Configure CFN_Nag
-          rake 'commit:cfn_nag:rules'
+          sh 'rake commit:cfn_nag:rules'
 
           // Static Analysis
-          rake 'commit:static_analysis'
+          sh 'rake commit:static_analysis'
 
           // Security / Static Analysis
-          rake 'commit:security_test'
+          sh 'rake commit:security_test'
 
           // Unit Tests
-          rake 'commit:unit_test'
+          sh 'rake commit:unit_test'
         }
       }
 
       stage('Acceptance') {
         def region = env.AWS_REGION == null ? 'us-east-1' : env.AWS_REGION
-        withRvm {
+        withEnv(['PATH=/sbin:/usr/sbin:/bin:/usr/bin:/var/lib/jenkins/bin:/usr/local/bin']) {
           // Create Acceptance Environment
-          rake 'acceptance:create_environment'
+          sh 'rake acceptance:create_environment'
 
           // Infrastructure Tests
-          rake 'acceptance:infrastructure_test'
+          sh 'rake acceptance:infrastructure_test'
 
           // Integration Tests
-          rake 'acceptance:integration_test'
+          sh 'rake acceptance:integration_test'
 
           // Security / Integration Tests
-          rake 'acceptance:security_test'
+          sh 'rake acceptance:security_test'
         }
       }
 
       stage('Capacity') {
-        withRvm {
+        withEnv(['PATH=/sbin:/usr/sbin:/bin:/usr/bin:/var/lib/jenkins/bin:/usr/local/bin']) {
           // Security / Penetration Tests
-          rake 'capacity:security_test'
+          sh 'rake capacity:security_test'
 
           // Capacity Test
-          rake 'capacity:capacity_test'
+          sh 'rake capacity:capacity_test'
         }
       }
 
       stage('Deployment') {
-        withRvm {
+        withEnv(['PATH=/sbin:/usr/sbin:/bin:/usr/bin:/var/lib/jenkins/bin:/usr/local/bin']) {
           // Deployment
-          rake 'deployment:production'
+          sh 'rake deployment:production'
 
           // Deployment Verification
-          rake 'deployment:smoke_test'
+          sh 'rake deployment:smoke_test'
         }
       }
 
-  } catch(err) {
+  }
+
+  catch(err) {
     handleException(err)
   }
 }
 
-// Configures RVM for the workspace
-def withRvm(Closure stage) {
-  rubyVersion = 'ruby-2.2.5'
-  rvmGemset = 'devsecops'
-  RVM_HOME = '$HOME/.rvm'
-
-  paths = [
-      "$RVM_HOME/gems/$rubyVersion@$rvmGemset/bin",
-      "$RVM_HOME/gems/$rubyVersion@global/bin",
-      "$RVM_HOME/rubies/$rubyVersion/bin",
-      "$RVM_HOME/bin",
-      "${env.PATH}"
-  ]
-
-  env.PATH = paths.join(':')
-  env.GEM_HOME = "$RVM_HOME/gems/$rubyVersion@$rvmGemset"
-  env.GEM_PATH = "$RVM_HOME/gems/$rubyVersion@$rvmGemset:$RVM_HOME/gems/$rubyVersion@global"
-  env.MY_RUBY_HOME = "$RVM_HOME/rubies/$rubyVersion"
-  env.IRBRC = "$RVM_HOME/rubies/$rubyVersion/.irbrc"
-  env.RUBY_VERSION = "$rubyVersion"
-
-  stage()
-}
-
-// Helper function for rake
-def rake(String command) {
-  sh "bundle exec rake $command"
-}
 
 // Exception helper
 def handleException(Exception err) {

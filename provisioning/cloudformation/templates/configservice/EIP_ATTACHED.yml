@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS DevSecOps Workshop - configservice - eip attached
+
+Resources:
+  AWSConfigRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: !Ref 'ConfigRuleName'
+      Description: Checks whether all EIP addresses allocated to a VPC are attached
+        to EC2 instances or in-use ENIs.
+      InputParameters: {}
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::EIP
+      Source:
+        Owner: AWS
+        SourceIdentifier: EIP_ATTACHED
+
+Parameters:
+  ConfigRuleName:
+    Type: String
+    Default: eip-attached
+    Description: The name that you assign to the AWS Config rule.
+    MinLength: '1'
+    ConstraintDescription: This parameter is required.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Required
+        Parameters: []
+      - Label:
+          default: Optional
+        Parameters: []
+
+Conditions: {}

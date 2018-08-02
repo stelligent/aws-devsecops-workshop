@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS DevSecOps Workshop - configservice - root account mfa enabled
+
+Resources:
+  AWSConfigRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: !Ref 'ConfigRuleName'
+      Description: Checks whether the root user of your AWS account requires multi-factor
+        authentication for console sign-in.
+      InputParameters: {}
+      Scope: {}
+      Source:
+        Owner: AWS
+        SourceIdentifier: ROOT_ACCOUNT_MFA_ENABLED
+      MaximumExecutionFrequency: !Ref 'MaximumExecutionFrequency'
+
+Parameters:
+  ConfigRuleName:
+    Type: String
+    Default: root-account-mfa-enabled
+    Description: The name that you assign to the AWS Config rule.
+    MinLength: '1'
+    ConstraintDescription: This parameter is required.
+  MaximumExecutionFrequency:
+    Type: String
+    Default: TwentyFour_Hours
+    Description: The frequency that you want AWS Config to run evaluations for the
+      rule.
+    MinLength: '1'
+    ConstraintDescription: This parameter is required.
+    AllowedValues:
+      - One_Hour
+      - Three_Hours
+      - Six_Hours
+      - Twelve_Hours
+      - TwentyFour_Hours
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Required
+        Parameters: []
+      - Label:
+          default: Optional
+        Parameters: []
+
+Conditions: {}

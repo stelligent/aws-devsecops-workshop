@@ -7,39 +7,29 @@ module Pipeline
       @params = params
       @params[:region] = ENV['AWS_REGION']
       @params[:region] ||= 'us-east-1'
-
-      clone_inspector
       run_inspector
-      cleanup_inspector
-    end
-
-    def clone_inspector
-      # Ensure a clean slate
-      cleanup_inspector
-
-      # Clone the repo
-      system 'git', 'clone', 'https://github.com/stelligent/inspector-status'
     end
 
     def run_inspector
-      ENV['AWS_REGION'] ||= 'us-east-1'
-
       puts("\n\n=== AWS Inspector Report ===\n\n")
-      Dir.chdir('inspector-status') do
-        system 'bundle', 'install'
-        system './inspector.rb', '--target-tags', 'InspectorAuditable:true',
-               '--aws-name-prefix', 'AWS-DEVSECOPS-WORKSHOP',
-               '--failure-metrics', 'numeric_severity:9',
-               '--rules-to-run', 'SEC,COM,RUN,CIS',
-               '--asset-duration', '300'
+      template_arn = File.read('/var/lib/jenkins/jenkins_inspector_assessment_template_arn').strip
+      inspector = Aws::Inspector::Client.new(region: @params[:region])
+      assessment_run = inspector.start_assessment_run(assessment_template_arn: template_arn)
+      sleep(30) until inspector.describe_assessment_runs(
+        assessment_run_arns: [assessment_run.assessment_run_arn]
+      ).assessment_runs[0].state == 'COMPLETED'
+      findings = inspector.list_findings(assessment_run_arns: [assessment_run.assessment_run_arn], max_results: 7)
+      findings_detail = inspector.describe_findings(finding_arns: findings.finding_arns)
+      findings_detail.findings.each do |f|
+        puts "\n\nid: #{f.id}"
+        puts "title: #{f.title}"
+        puts "description: #{f.description}"
+        puts "recommendation: #{f.recommendation}"
+        puts "severity: #{f.severity}"
+        puts "numeric_severity: #{f.numeric_severity}"
+        puts "confidence: #{f.confidence}"
+        puts "indicator_of_comprimise: #{f.indicator_of_compromise}\n\n"
       end
-    rescue RuntimeError => errors
-      cleanup_inspector
-      raise errors
-    end
-
-    def cleanup_inspector
-      FileUtils.rm_rf('inspector-status')
     end
   end
 end

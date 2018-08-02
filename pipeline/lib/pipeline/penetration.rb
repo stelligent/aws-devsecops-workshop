@@ -31,9 +31,12 @@ module Pipeline
     end
 
     def run_penetration_test
-      system '/var/lib/jenkins/pen-test-app.py',
-             '--zap-host', 'localhost:9000',
-             '--target', "http://#{webserver_ip}"
+      system "\
+        virtualenv /var/lib/jenkins/venv; \
+        source /var/lib/jenkins/venv/bin/activate; \
+        pip install python-owasp-zap-v2.4; \
+        /var/lib/jenkins/pen-test-app.py --zap-host localhost:9000 --target http://#{webserver_ip}; \
+      "
       system 'behave features/penetration_test.feature'
     end
 

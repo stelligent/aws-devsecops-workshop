@@ -1,0 +1,164 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deployment of the AWS DevSecOps Workshop application.
+
+Parameters:
+  AmazonLinuxAMI:
+    Type: AWS::EC2::Image::Id
+    Description: Amazon Linux AMI to deploy with.
+    Default: ami-97785bed
+  InstanceType:
+    Type: String
+    Description: EC2 Instance Type to deploy.
+    Default: t2.micro
+  VPCID:
+    Type: AWS::EC2::VPC::Id
+    Description: Amazon VPC ID to deploy infrastructure into.
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID to deploy infrastructure into.
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: EC2 Keypair to use for the deployed EC2 instance.
+  Environment:
+    Type: String
+    Description: The environment name of this deployment.
+    AllowedValues:
+      - acceptance
+      - production
+  WorldCIDR:
+    Type: String
+    Description: CIDR block for users to access web server.
+  UUID:
+    Type: String
+    Description: Jenkins UUID
+
+Resources:
+  ApplicationSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref 'VPCID'
+      GroupDescription: HTTP access for deployment.
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: !Ref 'WorldCIDR'
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          SourceSecurityGroupId: !ImportValue 'DevSecOps-JenkinsSecurityGroup'
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: !Ref 'WorldCIDR'
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: !Ref 'WorldCIDR'
+
+  WebServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref 'AmazonLinuxAMI'
+      InstanceType: !Ref 'InstanceType'
+      KeyName: !Ref 'KeyPairName'
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeleteOnTermination: true
+          SubnetId: !Ref 'SubnetId'
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref 'ApplicationSecurityGroup'
+      Tags:
+        - Key: Name
+          Value: !Join
+            - ' - '
+            - - AWS DevSecOps Workshop
+              - !Ref 'Environment'
+        - Key: Environment
+          Value: !Ref 'Environment'
+        - Key: UUID
+          Value: !Ref 'UUID'
+        - Key: InspectorAuditable
+          Value: 'true'
+        - Key: Stack
+          Value: !Ref 'AWS::StackName'
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          yum -y update
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource WebServer --configsets full_install --region ${AWS::Region}
+          /opt/aws/bin/cfn-signal -e $? --resource WebServer --stack ${AWS::StackId} --region ${AWS::Region}
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          full_install:
+            - install_cfn
+            - install_deps
+            - install_nginx
+            - install_inspector
+        install_cfn:
+          files:
+            /etc/cfn/cfn-hup.conf:
+              content: !Sub |
+                [main]
+                stack=${AWS::StackId}
+                region=${AWS::Region}
+              mode: '000400'
+              owner: root
+              group: root
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.WebServer.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServer --configsets full_install --region ${AWS::Region}
+                runas=root
+          services:
+            sysvinit:
+              cfn-hup:
+                enabled: true
+                ensureRunning: true
+                files:
+                  - /etc/cfn/cfn-hup.conf
+                  - /etc/cfn/hooks.d/cfn-auto-reloader.conf
+        install_deps:
+          packages:
+            yum:
+              perl-devel: []
+              zlib-devel: []
+              openssl-devel: []
+              gcc: []
+        install_nginx:
+          packages:
+            yum:
+              nginx: []
+          services:
+            sysvinit:
+              nginx:
+                enabled: true
+                ensureRunning: true
+                files:
+                  - /etc/nginx/nginx.conf
+        install_inspector:
+          files:
+            /root/install_inspector.sh:
+              source: https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install
+              mode: '000644'
+              owner: root
+              group: root
+          commands:
+            01-install-inspector:
+              command: bash /root/install_inspector.sh
+          services:
+            sysinit:
+              awsagent:
+                enabled: true
+                ensureRunning: true
+
+Outputs:
+  EC2PublicIP:
+    Value: !GetAtt 'WebServer.PublicIp'
+  EC2PrivateIP:
+    Value: !GetAtt 'WebServer.PrivateIp'

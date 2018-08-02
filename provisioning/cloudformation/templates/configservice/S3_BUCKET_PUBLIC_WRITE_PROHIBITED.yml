@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS DevSecOps Workshop - configservice - s3 buckket public write prohibited
+
+Resources:
+  AWSConfigRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: !Ref 'ConfigRuleName'
+      Description: Checks that your S3 buckets do not allow public write access. If
+        an S3 bucket policy or bucket ACL allows public write access, the bucket is
+        noncompliant.
+      InputParameters: {}
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::S3::Bucket
+      Source:
+        Owner: AWS
+        SourceIdentifier: S3_BUCKET_PUBLIC_WRITE_PROHIBITED
+
+Parameters:
+  ConfigRuleName:
+    Type: String
+    Default: s3-bucket-public-write-prohibited
+    Description: The name that you assign to the AWS Config rule.
+    MinLength: '1'
+    ConstraintDescription: This parameter is required.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Required
+        Parameters: []
+      - Label:
+          default: Optional
+        Parameters: []
+
+Conditions: {}

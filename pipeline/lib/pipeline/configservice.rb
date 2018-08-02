@@ -14,7 +14,6 @@ module Pipeline
 
     def report_config_status
       ENV['AWS_REGION'] ||= 'us-east-1'
-
       puts("\n\n=== AWS ConfigService Report ===\n\n")
       @configservice.describe_config_rules.config_rules.each do |rule|
         puts("\n")

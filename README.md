@@ -4,69 +4,66 @@ A continuous security pipeline demo for the AWS DevSecOps Workshop.
 ## Prerequisites
 Before you get started, there are a few things you will to need to prepare.
 
+
 ### AWS Account
 We recommend using a new AWS account for the workshop environment. You can also use an existing account, but make sure the account has no existing resources created. Some of the security checks executed by this workshop may discover resources that are not configured to best practices and fail your pipeline.
+
 
 ### AWS CLI
 [Install the aws-cli](http://docs.aws.amazon.com/cli/latest/userguide/installing.html#install-bundle-other-os) and use `aws configure` to set your AWS Access Keys for your development environment (the account specified above).
 
-#### Ruby 2.2.5
-Your development environment *must* have ruby 2.2.5 or better to install the dependencies of the scripts used to stand up the workshop environment. [RVM](https://rvm.io/) is a tool that can be used for switching between multiple versions.
 
-## Setup Jenkins
-This repository contains some scripts to stand up a Jenkins in AWS pre-configured to execute this pipeline.
-
-### Create Workshop Environment
-
-One-button launch of the workshop environment:
-
-[![Launch CFN stack](https://s3.amazonaws.com/stelligent-training-public/public/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#cstack=sn~AWS-DEVSECOPS-WORKSHOP-JENKINS|turl~https://s3.amazonaws.com/aws-devsecops-workshop/workshop-jenkins.json)
-
-To launch from the AWS Console, use the following CloudFormation template:
-[`provisioning/cloudformation/templates/workshop-jenkins.json`](https://s3.amazonaws.com/aws-devsecops-workshop/workshop-jenkins.json)
-
-To launch from the CLI, see this example:
-
+## Jenkins Configuration
+- Jenkins is bootstrapped via an Ansible Playbook executed in CFN cloud-init.
+- Ansible Playbook expects latest Amazon Linux AMI.
+- Jenkins auto-generated initial password is made permanent.
+- Jenkins admin username/password are written to SSM ParameterStore.
+- The following SSM Keys are populated:
 ```
-aws cloudformation create-stack \
---stack-name AWS-DEVSECOPS-WORKSHOP-JENKINS  \
---template-body https://s3.amazonaws.com/aws-devsecops-workshop/workshop-jenkins.json \
---region us-east-1 \
---disable-rollback \
---capabilities="CAPABILITY_NAMED_IAM" \
---parameters ParameterKey=InstanceType,ParameterValue=t2.small \
-  ParameterKey=WorldCIDR,ParameterValue=0.0.0.0/0
+/DevSecOps/jenkins_ip
+/DevSecOps/jenkins_user
+/DevSecOps/jenkins_password
 ```
 
-To launch from your terminal, see this example:
 
-```bash
-$ bundle install
-$ rake jenkins:create
-```
+## Pipeline Stages
+- Commit
+  1. cfn_nag
+  2. rubocop
+  3. unit tests
 
-See `docs/development.md` for more details about the ruby/rake tasks.
+- Acceptance
+  1. create environment
+    - cloudformation
+  2. infrastructure tests
+  3. integration tests
+    - serverspec
+    - cucumber
+  4. security environment tests
+    - aws configservice
+    - aws inspector
 
-### Jenkins Credentials
-The initial admin user to jenkins is preconfigured, the credentials are below.
+- Capacity
+  1. security penetration tests
+    - owasp zap
+  2. capactity tests
+    - apache benchmark
 
-**It is _highly_ recommended that you change the password to your workshop jenkins after creation.**
-
-#### Login
-* User: `workshop`
-* Password: `Fancy$Treasury!Effective!Throw^6`
-
-#### Github
-You'll need to create a [jenkins credential set](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin) to access private repositories in Jenkins.
+- Deployment
+  1. production deploy
+  2. smoke tests
+    - cucumber
 
 
-#### Deployment script
-you can optionally use `deploy.sh` to control stack. if you do so, these variables must be personalized at top of file:
-```
-PROFILE  # the aws profile to launch cfn with
-TRUSTED_CIDR  # the source CIDR that will be connecting to jenkins.
-SSH_KEY_NAME  # the ssh key to use for the jenkins server
-```
+## Create Workshop Environment
 
-#### Egress Rules
-Github, RubyGems, and AWS API Endpoints only traffic allowed out (other than stateful responses).
+- One-button launch of the workshop environment:
+  `./deploy.sh`
+- TRUSTED_CIDR is expected to be exported in the environment (example: "export TRUSTED_CIDR=100.20.30.45/32")
+- Variables at the top of `deploy.sh` may need to be customized.
+
+
+## Egress Rules
+TODO: Lockdown outgoing traffic
+- prevent exfiltration with egress rules
+- Github, RubyGems, and AWS API Endpoints only traffic allowed out

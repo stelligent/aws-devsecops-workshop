@@ -14,7 +14,7 @@ module Pipeline
       template_path = 'provisioning/cloudformation/templates'
       {
         stack_name: stack_name,
-        template_body: File.read("#{template_path}/#{template_name}.json"),
+        template_body: File.read("#{template_path}/#{template_name}.yml"),
         parameters: stack_parameters
       }
     end
@@ -78,13 +78,6 @@ module Pipeline
       true
     rescue Aws::CloudFormation::Errors::ValidationError
       false
-    end
-
-    def connector_sg
-      @cloudformation.describe_stack_resource(
-        stack_name: ENV['STACK_NAME'],
-        logical_resource_id: 'JenkinsConnector'
-      ).stack_resource_detail.physical_resource_id
     end
   end
 end
