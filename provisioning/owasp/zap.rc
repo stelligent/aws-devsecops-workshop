@@ -1,0 +1,40 @@
+#!/bin/bash
+# startup script for owasp zap
+# chkconfig: 2345 20 80
+# description: Starts and stops owasp zap
+
+. /etc/init.d/functions
+
+PROG=zap.sh
+PROG_BIN=/opt/zap/$PROG
+PROG_LOCKFILE=/var/lock/subsys/$PROG
+PROG_LOGFILE=/var/log/$PROG.log
+PROG_PIDFILE=/var/run/$PROG.pid
+PROG_PORT=9000
+
+case $1 in
+  start)
+    started=$(status -p $PROG_PIDFILE $PROG_BIN)
+    [[ $started =~ running ]] && echo $started && RETVAL=1
+    echo "Starting $PROG "
+    nohup $PROG_BIN -daemon -port $PROG_PORT -config api.disablekey=true >>$PROG_LOGFILE 2>&1 &
+    RETVAL=$?
+    echo $! > $PROG_PIDFILE
+    [[ $RETVAL ]] && touch $PROG_LOCKFILE
+  ;;
+  stop)
+    echo "Stopping $PROG "
+    killproc -p $PROG_PIDFILE $PROG_BIN
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && rm -f $PROG_LOCKFILE
+  ;;
+  status)
+    $PROG_BIN status
+  ;;
+  *)
+    echo "Usage $0 {start|stop|status}"
+    RETVAL=1
+  ;;
+esac
+
+exit $RETVAL

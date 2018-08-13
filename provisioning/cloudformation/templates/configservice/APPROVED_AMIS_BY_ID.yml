@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS DevSecOps Workshop - configservice - approved amis by id
+
+Resources:
+  AWSConfigRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: !Ref 'ConfigRuleName'
+      Description: Checks whether running instances are using specified AMIs.
+      InputParameters:
+        amiIds: !If
+          - amiIds
+          - !Ref 'amiIds'
+          - !Ref 'AWS::NoValue'
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::Instance
+      Source:
+        Owner: AWS
+        SourceIdentifier: APPROVED_AMIS_BY_ID
+
+Parameters:
+  ConfigRuleName:
+    Type: String
+    Default: approved-amis-by-id
+    Description: The name that you assign to the AWS Config rule.
+    MinLength: '1'
+    ConstraintDescription: This parameter is required.
+  amiIds:
+    Type: String
+    Description: Specify AMI IDs (comma separated list of up to 10).
+    MinLength: '1'
+    ConstraintDescription: This parameter is required.
+    Default: ami-97785bed
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Required
+        Parameters:
+          - amiIds
+      - Label:
+          default: Optional
+        Parameters: []
+
+Conditions:
+  amiIds: !Not
+    - !Equals
+      - ''
+      - !Ref 'amiIds'

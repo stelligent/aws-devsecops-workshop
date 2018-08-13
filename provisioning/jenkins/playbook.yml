@@ -1,0 +1,132 @@
+---
+- name: configure jenkins with plugins
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    jenkins_home: "/var/lib/jenkins"
+    jenkins_admin_username: "admin"
+    jenkins_admin_password_file: "/var/lib/jenkins/secrets/initialAdminPassword"
+    jenkins_plugins:
+      - git
+      - build-pipeline-plugin
+      - job-dsl
+      - git-client
+      - scm-api
+      - credentials
+      - workflow-scm-step
+      - matrix-project
+      - structs
+      - workflow-step-api
+      - mailer
+      - ssh-credentials
+      - parameterized-trigger
+      - jquery
+      - conditional-buildstep
+      - apache-httpcomponents-client-4-api
+      - jsch
+      - display-url-api
+      - junit
+      - workflow-api
+      - maven-plugin
+      - javadoc
+      - token-macro
+      - run-condition
+      - workflow-aggregator
+      - workflow-durable-task-step
+      - pipeline-stage-view
+      - workflow-basic-steps
+      - workflow-job
+      - pipeline-stage-step
+      - workflow-cps
+      - pipeline-build-step
+      - workflow-support
+      - pipeline-model-definition
+      - pipeline-input-step
+      - workflow-multibranch
+      - workflow-cps-global-lib
+      - pipeline-milestone-step
+      - durable-task
+      - momentjs
+      - jquery-detached
+      - handlebars
+      - pipeline-rest-api
+      - ace-editor
+      - pipeline-graph-analysis
+      - jackson2-api
+      - cloudbees-folder
+      - git-server
+      - branch-api
+      - credentials-binding
+      - docker-workflow
+      - pipeline-model-api
+      - pipeline-model-declarative-agent
+      - pipeline-model-extensions
+      - pipeline-stage-tags-metadata
+      - plain-credentials
+      - docker-commons
+      - authentication-tokens
+      - script-security
+
+  tasks:
+    - name: set jenkins admin password fact
+      set_fact:
+        jenkins_admin_password: "{{ lookup('file', jenkins_admin_password_file) }}"
+
+    - name: get jenkins public ip
+      uri:
+        url: http://169.254.169.254/latest/meta-data/public-ipv4
+        return_content: true
+      register: public_ip
+
+    - name: set jenkins url
+      replace:
+        dest: /var/lib/jenkins/jenkins.model.JenkinsLocationConfiguration.xml
+        regexp: 'JENKINS_URL'
+        replace: "http://{{ public_ip.content }}/"
+
+    - name: set jenkins public ip in SSM
+      aws_ssm_parameter_store:
+        name: "/DevSecOps/jenkins_ip"
+        value: "{{ public_ip.content }}"
+        region: "{{ aws_region }}"
+
+    - name: set jenkins user in SSM
+      aws_ssm_parameter_store:
+        name: "/DevSecOps/jenkins_user"
+        value: "{{ jenkins_admin_username }}"
+        region: "{{ aws_region }}"
+
+    - name: set jenkins password in SSM
+      aws_ssm_parameter_store:
+        name: "/DevSecOps/jenkins_password"
+        value: "{{ jenkins_admin_password }}"
+        region: "{{ aws_region }}"
+
+    - name: install jenkins plugins using password
+      jenkins_plugin:
+        name: "{{ item }}"
+        jenkins_home: "{{ jenkins_home }}"
+        url_username: "{{ jenkins_admin_username }}"
+        url_password: "{{ jenkins_admin_password }}"
+        state: latest
+        updates_expiration: 0
+        with_dependencies: yes
+      with_items: "{{ jenkins_plugins }}"
+
+    - name: bypass jenkins initial screen
+      replace:
+        dest: /var/lib/jenkins/config.xml
+        regexp: 'NEW'
+        replace: 'RUNNING'
+
+    - name: set admin display name
+      replace:
+        dest: /var/lib/jenkins/users/admin/config.xml
+        regexp: 'admin'
+        replace: 'AWS DevSecOps Workshop'
+
+    - name: restart jenkins
+      service:
+        name: jenkins
+        state: restarted

@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS DevSecOps Workshop - configservice - desired instance type
+
+Resources:
+  AWSConfigRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: !Ref 'ConfigRuleName'
+      Description: Checks whether your EC2 instances are of the specified instance
+        types.
+      InputParameters:
+        instanceType: !If
+          - instanceType
+          - !Ref 'instanceType'
+          - !Ref 'AWS::NoValue'
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::Instance
+      Source:
+        Owner: AWS
+        SourceIdentifier: DESIRED_INSTANCE_TYPE
+
+Parameters:
+  ConfigRuleName:
+    Type: String
+    Default: desired-instance-type
+    Description: The name that you assign to the AWS Config rule.
+    MinLength: '1'
+    ConstraintDescription: This parameter is required.
+  instanceType:
+    Type: String
+    Description: Comma separated list of EC2 instance types (for example, 't2.small,
+      m4.large').
+    MinLength: '1'
+    ConstraintDescription: This parameter is required.
+    Default: t2.micro, t2.small
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Required
+        Parameters:
+          - instanceType
+      - Label:
+          default: Optional
+        Parameters: []
+
+Conditions:
+  instanceType: !Not
+    - !Equals
+      - ''
+      - !Ref 'instanceType'

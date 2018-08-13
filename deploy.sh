@@ -1,70 +1,73 @@
-#!/bin/bash
+#!/bin/bash -ex
 
-if [ -z ${TRUSTED_CIDR} ]; then
-  echo -e "\n\nPlease export TRUSTED_CIRD. Example: '0.0.0.0/0'\n\n"
-  exit 1
-fi
-if [ -z ${SSH_KEY_NAME} ]; then
-  echo -e "\n\nPlease export SSH_KEY_NAME. Example: 'my-ec2-keypair'\n\n"
-  exit 1
-fi
-if [ -z ${TOP_LEVEL_DOMAIN} ]; then
-  echo -e "\n\nPlease export TOP_LEVEL_DOMAIN with trailing dot."
-  echo -e "The Top Level Domain must be hosted in the account in which this stack is being launched."
-  echo -e "Example: 'example.com.'\n\n"
-  exit 1
+INSTANCE_TYPE=t2.small
+JENKINS_STACK_NAME=AWS-DEVSECOPS-WORKSHOP-JENKINS
+VPC_STACK_NAME=AWS-DEVSECOPS-WORKSHOP-VPC
+JENKINS_STACK_TEMPLATE=./provisioning/cloudformation/templates/workshop-jenkins.yml
+VPC_STACK_TEMPLATE=./provisioning/cloudformation/templates/workshop-vpc.yml
+SUBNET_CIDR=10.10.21.0/24
+VPC_CIDR=10.10.21.0/22
+OWASP_ZAP_VERSION=2.5.0
+IMAGE_ID=ami-97785bed  # latest amzn linux
+SSH_KEY_NAME=devsecops
+GITHUB_OWNER=stelligent
+GITHUB_BRANCH=master
+
+# allow outbound traffic
+RUBYGEMS_CIDR=151.101.0.0/16
+GITHUB_CIDR=192.30.252.0/22
+AMAZON_CIDR_1=54.224.0.0/12
+AMAZON_CIDR_2=52.192.0.0/11
+UBUNTU_CIDR=0.0.0.0/0  # fixme
+
+if [ "${TRUSTED_CIDR}" == "0.0.0.0/0" -o -z "${TRUSTED_CIDR}" ]; then
+   echo 'Please export TRUSTED_CIDR and ensure it is not open to the world (0.0.0.0/0).'
+   exit 1
 fi
 
+VPC_PARAMETERS="\
+  TrustedCIDR=${TRUSTED_CIDR} \
+  UbuntuCIDR=${UBUNTU_CIDR} \
+  AmazonCIDR1=${AMAZON_CIDR_1} \
+  AmazonCIDR2=${AMAZON_CIDR_2} \
+  GithubCIDR=${GITHUB_CIDR} \
+  RubygemsCIDR=${RUBYGEMS_CIDR} \
+  SubnetCIDR=${SUBNET_CIDR} \
+  VpcCIDR=${VPC_CIDR} \
+"
 
-INSTANCE_TYPE="t2.small"
-STACK_NAME="AWS-DEVSECOPS-WORKSHOP-JENKINS"
+JENKINS_PARAMETERS="\
+  InstanceType=${INSTANCE_TYPE} \
+  JenkinsKeyName=${SSH_KEY_NAME} \
+  TrustedCIDR=${TRUSTED_CIDR} \
+  ZapVersion=${OWASP_ZAP_VERSION} \
+  ImageId=${IMAGE_ID} \
+  JenkinsKeyName=${SSH_KEY_NAME} \
+  GitHubOwner=${GITHUB_OWNER} \
+  GitHubBranch=${GITHUB_BRANCH} \
+"
 
-if [ $# -gt 0 ]; then
-  case "$1" in
-    update)
-      echo -e "\n\nUpdating DevSecOps Workshop Stack:\n\n"
-      aws cloudformation update-stack \
-        --stack-name ${STACK_NAME} \
-        --template-body file://./provisioning/cloudformation/templates/workshop-jenkins.json \
-        --capabilities CAPABILITY_NAMED_IAM \
-        --parameters \
-          ParameterKey=InstanceType,ParameterValue=${INSTANCE_TYPE} \
-          ParameterKey=TopLevelDomain,ParameterValue=${TOP_LEVEL_DOMAIN} \
-          ParameterKey=JenkinsKeyName,ParameterValue=${SSH_KEY_NAME} \
-          ParameterKey=TrustedCIDR,ParameterValue=${TRUSTED_CIDR}
-      ;;
-    delete)
-      echo -e "\n\nDeleting DevSecOps Workshop Stack:\n\n"
-      aws cloudformation delete-stack --profile ${PROFILE} --stack-name ${STACK_NAME}
-      ;;
-    rezs)
-      echo -e "\n\nDevSecOps Stack Resources:\n\n"
-      aws cloudformation describe-stack-resources --profile ${PROFILE} --stack-name ${STACK_NAME}
-      ;;
-    status)
-      echo -e "\n\nDevSecOps Stack Status:\n\n"
-      aws cloudformation describe-stacks --profile ${PROFILE} --stack-name ${STACK_NAME}
-      ;;
-    watch)
-      watch "aws cloudformation describe-stack-events --profile ${PROFILE} --stack-name ${STACK_NAME}"
-      ;;
-    events)
-      aws cloudformation describe-stack-events --profile ${PROFILE} --stack-name ${STACK_NAME} | nl
-      ;;
-    *) echo -e "\n\nValid commands are 'update', 'status', 'watch', 'events', 'rezs', or 'delete'\n\n"
-      exit 1
-      ;;
-  esac
-else
-  echo -e "\n\nDeploying DevSecOps Workshop Stack:\n\n"
-  aws cloudformation create-stack \
-    --stack-name ${STACK_NAME} \
-    --template-body file://./provisioning/cloudformation/templates/workshop-jenkins.json \
-    --disable-rollback \
-    --capabilities CAPABILITY_NAMED_IAM \
-    --parameters \
-      ParameterKey=InstanceType,ParameterValue=${INSTANCE_TYPE} \
-      ParameterKey=TopLevelDomain,ParameterValue=${TOP_LEVEL_DOMAIN} \
-      ParameterKey=JenkinsKeyName,ParameterValue=${SSH_KEY_NAME} \
-      ParameterKey=TrustedCIDR,ParameterValue=${TRUSTED_CIDR}
-fi
+echo -e "\n\nDeploying DevSecOps Workshop VPC Stack:\n\n"
+aws cloudformation deploy \
+  --stack-name ${VPC_STACK_NAME} \
+  --template-file ${VPC_STACK_TEMPLATE} \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --no-fail-on-empty-changeset \
+  --parameter-overrides ${VPC_PARAMETERS}
+
+echo -e "\n\nDeploying DevSecOps Workshop Jenkins Stack:\n\n"
+aws cloudformation deploy \
+  --stack-name ${JENKINS_STACK_NAME} \
+  --template-file ${JENKINS_STACK_TEMPLATE} \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --no-fail-on-empty-changeset \
+  --parameter-overrides ${JENKINS_PARAMETERS}
+
+echo -e "\n\nDeploying DevSecOps Workshop ConfigService Stacks:\n\n"
+for CONFIG_TEMPLATE_PATH in $(ls provisioning/cloudformation/templates/configservice/); do
+  CONFIG_TEMPLATE_NAME=$(echo $CONFIG_TEMPLATE_PATH | cut -f1 -d\. | sed 's|_|-|g')
+  aws cloudformation deploy \
+    --stack-name AWS-DEVSECOPS-WORKSHOP-CONFIGSERVICE-${CONFIG_TEMPLATE_NAME} \
+    --template-file ./provisioning/cloudformation/templates/configservice/${CONFIG_TEMPLATE_PATH} \
+    --no-fail-on-empty-changeset
+done

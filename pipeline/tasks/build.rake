@@ -7,10 +7,11 @@ namespace :commit do
 
   desc 'Install custom CFN_Nag rules'
   task :'cfn_nag:rules' do
-    gem_path = ENV['GEM_HOME']
-    igw_rules_path = 'lib/json_rules/igw_rules.rb'
+    puts 'Install custom CFN_Nag rules'
+    cfn_nag_path = File.read('cfn-nag.path').strip
+    igw_rules_path = 'lib/cfn-nag/custom_rules/igw_rules.rb'
     File.write(
-      "#{gem_path}/gems/cfn-nag-0.0.19/#{igw_rules_path}",
+      "#{cfn_nag_path}/#{igw_rules_path}",
       File.read("pipeline/lib/cfn_nag/#{igw_rules_path}")
     )
   end

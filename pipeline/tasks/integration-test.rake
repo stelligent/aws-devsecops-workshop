@@ -11,7 +11,11 @@ namespace :acceptance do
   end
 
   desc 'Integration tests for web service'
-  Cucumber::Rake::Task.new(:cucumber) do |t|
-    t.cucumber_opts = '--tags @acceptance features/webserver.feature'
+  Cucumber::Rake::Task.new do |t|
+    t.cucumber_opts = [
+      'features/webserver.feature',
+      '--tags @acceptance',
+      '--format pretty'
+    ]
   end
 end
