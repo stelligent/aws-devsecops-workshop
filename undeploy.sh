@@ -5,18 +5,18 @@ AWS_REGION=us-east-1
 
 VPC_STACK_NAME=AWS-DEVSECOPS-WORKSHOP-VPC
 JENKINS_STACK_NAME=AWS-DEVSECOPS-WORKSHOP-JENKINS
+DEPLOY_STACK_NAME=AWS-DEVSECOPS-WORKSHOP-DEPLOY
+CONFIGSERVICE_STACK_NAME=AWS-DEVSECOPS-WORKSHOP-CONFIGSERVICE
 
-echo -e "\n\nUnDeploying DevSecOps Workshop VPC Stack:\n\n"
+echo -e "\n\nUnDeploying any orphaned deployment stacks:\n\n"
 aws cloudformation delete-stack \
     --profile ${AWS_PROFILE} \
     --region ${AWS_REGION} \
-    --stack-name ${VPC_STACK_NAME} 
-
-echo -e "\n\nUnDeploying DevSecOps Workshop Jenkins Stack:\n\n"
+    --stack-name ${DEPLOY_STACK_NAME}-PRODUCTION || true
 aws cloudformation delete-stack \
     --profile ${AWS_PROFILE} \
     --region ${AWS_REGION} \
-    --stack-name ${JENKINS_STACK_NAME}
+    --stack-name ${DEPLOY_STACK_NAME}-ACCEPTANCE || true
 
 echo -e "\n\nUnDeploying DevSecOps Workshop ConfigService Stacks:\n\n"
 for CONFIG_TEMPLATE_PATH in $(ls provisioning/cloudformation/templates/configservice/); do
@@ -24,5 +24,17 @@ for CONFIG_TEMPLATE_PATH in $(ls provisioning/cloudformation/templates/configser
   aws cloudformation delete-stack \
     --profile ${AWS_PROFILE} \
     --region ${AWS_REGION} \
-    --stack-name AWS-DEVSECOPS-WORKSHOP-CONFIGSERVICE-${CONFIG_TEMPLATE_NAME}
+    --stack-name ${CONFIGSERVICE_STACK_NAME}-${CONFIG_TEMPLATE_NAME} || true
 done
+
+echo -e "\n\nUnDeploying DevSecOps Workshop Jenkins Stack:\n\n"
+aws cloudformation delete-stack \
+    --profile ${AWS_PROFILE} \
+    --region ${AWS_REGION} \
+    --stack-name ${JENKINS_STACK_NAME} || true
+
+echo -e "\n\nUnDeploying DevSecOps Workshop VPC Stack:\n\n"
+aws cloudformation delete-stack \
+    --profile ${AWS_PROFILE} \
+    --region ${AWS_REGION} \
+    --stack-name ${VPC_STACK_NAME} || true
