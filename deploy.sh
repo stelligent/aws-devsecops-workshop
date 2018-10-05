@@ -1,5 +1,7 @@
 #!/bin/bash -ex
 
+AWS_PROFILE=default
+AWS_REGION=us-east-1
 INSTANCE_TYPE=t2.small
 JENKINS_STACK_NAME=AWS-DEVSECOPS-WORKSHOP-JENKINS
 VPC_STACK_NAME=AWS-DEVSECOPS-WORKSHOP-VPC
@@ -42,13 +44,14 @@ JENKINS_PARAMETERS="\
   TrustedCIDR=${TRUSTED_CIDR} \
   ZapVersion=${OWASP_ZAP_VERSION} \
   ImageId=${IMAGE_ID} \
-  JenkinsKeyName=${SSH_KEY_NAME} \
   GitHubOwner=${GITHUB_OWNER} \
   GitHubBranch=${GITHUB_BRANCH} \
 "
 
 echo -e "\n\nDeploying DevSecOps Workshop VPC Stack:\n\n"
 aws cloudformation deploy \
+  --profile ${AWS_PROFILE} \
+  --region ${AWS_REGION} \
   --stack-name ${VPC_STACK_NAME} \
   --template-file ${VPC_STACK_TEMPLATE} \
   --capabilities CAPABILITY_NAMED_IAM \
@@ -57,6 +60,8 @@ aws cloudformation deploy \
 
 echo -e "\n\nDeploying DevSecOps Workshop Jenkins Stack:\n\n"
 aws cloudformation deploy \
+  --profile ${AWS_PROFILE} \
+  --region ${AWS_REGION} \
   --stack-name ${JENKINS_STACK_NAME} \
   --template-file ${JENKINS_STACK_TEMPLATE} \
   --capabilities CAPABILITY_NAMED_IAM \
@@ -67,6 +72,8 @@ echo -e "\n\nDeploying DevSecOps Workshop ConfigService Stacks:\n\n"
 for CONFIG_TEMPLATE_PATH in $(ls provisioning/cloudformation/templates/configservice/); do
   CONFIG_TEMPLATE_NAME=$(echo $CONFIG_TEMPLATE_PATH | cut -f1 -d\. | sed 's|_|-|g')
   aws cloudformation deploy \
+    --profile ${AWS_PROFILE} \
+    --region ${AWS_REGION} \
     --stack-name AWS-DEVSECOPS-WORKSHOP-CONFIGSERVICE-${CONFIG_TEMPLATE_NAME} \
     --template-file ./provisioning/cloudformation/templates/configservice/${CONFIG_TEMPLATE_PATH} \
     --no-fail-on-empty-changeset
