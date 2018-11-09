@@ -67,6 +67,7 @@
       - docker-commons
       - authentication-tokens
       - script-security
+      - lockable-resources
 
   tasks:
     - name: set jenkins admin password fact
