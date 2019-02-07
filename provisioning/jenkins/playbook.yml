@@ -114,17 +114,28 @@
         with_dependencies: yes
       with_items: "{{ jenkins_plugins }}"
 
+    - name: get admin user directory path
+      find:
+        paths: /var/lib/jenkins/users
+        pattern: admin_*
+        file_type: directory
+      register: admin_user_path
+
+    - name: verify admin user directory path
+      debug:
+        var: admin_user_path.files[0].path
+
+    - name: set admin display name
+      replace:
+        dest: "{{ admin_user_path.files[0].path }}/config.xml"
+        regexp: 'admin'
+        replace: 'AWS DevSecOps Workshop'
+
     - name: bypass jenkins initial screen
       replace:
         dest: /var/lib/jenkins/config.xml
         regexp: 'NEW'
         replace: 'RUNNING'
-
-    - name: set admin display name
-      replace:
-        dest: /var/lib/jenkins/users/admin/config.xml
-        regexp: 'admin'
-        replace: 'AWS DevSecOps Workshop'
 
     - name: restart jenkins
       service:
