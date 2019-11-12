@@ -10,10 +10,10 @@ VPC_STACK_TEMPLATE=./provisioning/cloudformation/templates/workshop-vpc.yml
 SUBNET_CIDR=10.10.21.0/24
 VPC_CIDR=10.10.21.0/22
 OWASP_ZAP_VERSION=2.5.0
-IMAGE_ID=ami-97785bed  # latest amzn linux
+IMAGE_ID=ami-00eb20669e0990cb4  # latest amzn linux
 SSH_KEY_NAME=devsecops
 GITHUB_OWNER=stelligent
-GITHUB_BRANCH=master
+GITHUB_BRANCH=update_cfn_nag
 
 # allow outbound traffic
 RUBYGEMS_CIDR=151.101.0.0/16

@@ -42,7 +42,7 @@ Resources:
     CreationPolicy:
       ResourceSignal:    
         Count: 1
-        Timeout: PT10M
+        Timeout: PT30M
 
   JenkinsLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate

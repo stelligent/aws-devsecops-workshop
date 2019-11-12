@@ -28,14 +28,29 @@ Parameters:
     Description: The Amazon CIDR block.
 
 Resources:
-  InternetGatewayStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: https://s3.amazonaws.com/aws-devsecops-workshop/workshop-igw.template
-      Parameters:
-        ParentStackName: !Ref 'AWS::StackName'
-        VPC: !Ref 'JenkinsVPC'
-      TimeoutInMinutes: '10'
+  # InternetGatewayStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: https://s3.amazonaws.com/aws-devsecops-workshop/workshop-igw.template
+  #     Parameters:
+  #       ParentStackName: !Ref 'AWS::StackName'
+  #       VPC: !Ref 'JenkinsVPC'
+  #     TimeoutInMinutes: '10'
+
+  InternetGateWay:
+    Type: AWS::EC2::InternetGateway
+    Properties: 
+      Tags: 
+        - Key: ParentStackName
+          Value: !Ref 'AWS::StackName'
+        - Key: VPC
+          Value: !Ref 'JenkinsVPC'
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: !Ref 'InternetGateWay'
+      VpcId: !Ref 'JenkinsVPC'
 
   JenkinsVPC:
     Type: AWS::EC2::VPC
@@ -65,13 +80,23 @@ Resources:
         - Key: Name
           Value: !Ref 'AWS::StackName'
 
+  # JenkinsRoute:
+  #   Type: AWS::EC2::Route
+  #   DependsOn: InternetGatewayStack
+  #   Properties:
+  #     RouteTableId: !Ref 'JenkinsRouteTable'
+  #     DestinationCidrBlock: '0.0.0.0/0'
+  #     GatewayId: !GetAtt 'InternetGatewayStack.Outputs.Gateway'
+
   JenkinsRoute:
     Type: AWS::EC2::Route
-    DependsOn: InternetGatewayStack
+    DependsOn: 
+      - InternetGateWay
+      - InternetGatewayAttachment
     Properties:
       RouteTableId: !Ref 'JenkinsRouteTable'
       DestinationCidrBlock: '0.0.0.0/0'
-      GatewayId: !GetAtt 'InternetGatewayStack.Outputs.Gateway'
+      GatewayId: !Ref 'InternetGateWay'
 
   JenkinsSubnetAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
