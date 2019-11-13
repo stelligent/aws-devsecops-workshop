@@ -9,11 +9,14 @@ describe 'Nginx Installation' do
   end
 
   # Correct version of nginx
+  # describe command('/usr/sbin/nginx -v') do
+  #   its(:stderr) { should match(%r{nginx version: nginx/1\.14\.[0-9]+}) }
+  #   its(:exit_status) { should eq 0 }
+  # end
   describe command('/usr/sbin/nginx -v') do
-    its(:stderr) { should match(%r{nginx version: nginx/1\.14\.[0-9]+}) }
+    its(:stderr) { should match(%r{nginx version: nginx/1\.16\.[0-9]+}) }
     its(:exit_status) { should eq 0 }
   end
-
   # Nginx should be running
   describe process('nginx') do
     it { should be_running }
