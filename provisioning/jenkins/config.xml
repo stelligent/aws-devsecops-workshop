@@ -35,9 +35,6 @@
   <primaryView>all</primaryView>
   <slaveAgentPort>-1</slaveAgentPort>
   <label></label>
-<!--   <crumbIssuer class="hudson.security.csrf.DefaultCrumbIssuer">
-    <excludeClientIPFromCrumb>true</excludeClientIPFromCrumb>
-  </crumbIssuer> -->
   <nodeProperties/>
   <globalNodeProperties/>
 </hudson>
