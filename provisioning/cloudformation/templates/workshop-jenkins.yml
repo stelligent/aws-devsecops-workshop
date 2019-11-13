@@ -57,6 +57,7 @@ Resources:
           Fn::Base64: !Sub |
             #!/bin/bash -xe
             yum -y update
+            pip install ansible
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource JenkinsLaunchTemplate --configsets full_install --region ${AWS::Region}
             /opt/aws/bin/cfn-signal -e $? --resource JenkinsServer --stack ${AWS::StackId} --region ${AWS::Region}
     Metadata:
@@ -114,12 +115,12 @@ Resources:
           packages:
             yum:
               jenkins: []
-          files:
-            /etc/sysconfig/jenkins:
-              source: !Sub https://raw.githubusercontent.com/${GitHubOwner}/aws-devsecops-workshop/${GitHubBranch}/provisioning/jenkins/sysconfig_jenkins
-              mode: '000600'
-              owner: root
-              group: root
+          # files:
+          #   /etc/sysconfig/jenkins:
+          #     source: !Sub https://raw.githubusercontent.com/${GitHubOwner}/aws-devsecops-workshop/${GitHubBranch}/provisioning/jenkins/sysconfig_jenkins
+          #     mode: '000600'
+          #     owner: root
+          #     group: root
           services:
             sysvinit:
               jenkins:
@@ -130,9 +131,15 @@ Resources:
         configure_jenkins:
           packages:
             python:
-              ansible: []
+              #ansible: "https://files.pythonhosted.org/packages/59/3a/5b8aeca9b0b68e7a02fdfd7260f265be3b0605839d7367501aba4bcb2e14/ansible-2.9.0.tar.gz"
               boto3: []
           files:
+          files:
+            /root/config.xml:
+              source: !Sub https://raw.githubusercontent.com/${GitHubOwner}/aws-devsecops-workshop/${GitHubBranch}/provisioning/jenkins/config.xml
+              mode: '000644'
+              owner: jenkins
+              group: jenkins
             /root/playbook.yml:
               source: !Sub https://raw.githubusercontent.com/${GitHubOwner}/aws-devsecops-workshop/${GitHubBranch}/provisioning/jenkins/playbook.yml
               mode: '000644'
