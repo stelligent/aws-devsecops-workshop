@@ -78,10 +78,15 @@
         group: jenkins
         mode: '0644'
 
-    # - name: restart1 jenkins
-    #   service:
-    #     name: jenkins
-    #     state: restarted
+    - name: restart1 jenkins
+      service:
+        name: jenkins
+        state: restarted
+
+    - name: sleep for 20 seconds and continue with play
+      wait_for:
+        timeout: 20
+      delegate_to: localhost
 
     - name: set jenkins admin password fact
       set_fact:
