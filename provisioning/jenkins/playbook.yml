@@ -78,10 +78,10 @@
         group: jenkins
         mode: '0644'
 
-    - name: restart1 jenkins
-      service:
-        name: jenkins
-        state: restarted
+    # - name: restart1 jenkins
+    #   service:
+    #     name: jenkins
+    #     state: restarted
 
     - name: set jenkins admin password fact
       set_fact:
@@ -151,7 +151,7 @@
         regexp: 'NEW'
         replace: 'RUNNING'
 
-    - name: restart2 jenkins
+    - name: restart jenkins
       service:
         name: jenkins
         state: restarted
