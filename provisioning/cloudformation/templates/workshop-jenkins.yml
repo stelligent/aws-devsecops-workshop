@@ -115,9 +115,9 @@ Resources:
             yum:
               jenkins: []
           files:
-            /var/lib/jenkins/config.xml:
-              source: !Sub https://raw.githubusercontent.com/${GitHubOwner}/aws-devsecops-workshop/${GitHubBranch}/provisioning/jenkins/config.xml
-              mode: '000644'
+            /etc/sysconfig/jenkins:
+              source: !Sub https://raw.githubusercontent.com/${GitHubOwner}/aws-devsecops-workshop/${GitHubBranch}/provisioning/jenkins/sysconfig_jenkins
+              mode: '000600'
               owner: root
               group: root
           services:
@@ -128,10 +128,10 @@ Resources:
                 files:
                   - /var/lib/jenkins/config.xml
         configure_jenkins:
-          # packages:
-          #   python:
-          #     ansible: []
-          #     boto3: []
+          packages:
+            python:
+              ansible: []
+              boto3: []
           files:
             /root/playbook.yml:
               source: !Sub https://raw.githubusercontent.com/${GitHubOwner}/aws-devsecops-workshop/${GitHubBranch}/provisioning/jenkins/playbook.yml
@@ -187,13 +187,9 @@ Resources:
               owner: jenkins
               group: jenkins
           commands:
-            01-install-pip-packages:
-              command: pip install ansible boto3
-            # 02-chown-jenkins-config:
-            #   command: chown -c jenkins. /var/lib/jenkins/config.xml
-            03-chown-seed-dir:
+            01-chown-seed-dir:
               command: chown -c jenkins. /var/lib/jenkins/jobs/seed-aws-devsecops-workshop
-            04-run-ansible:
+            02-run-ansible:
               command: !Sub /usr/local/bin/ansible-playbook -v /root/playbook.yml -e aws_region=${AWS::Region}
         install_nginx:
           files:
