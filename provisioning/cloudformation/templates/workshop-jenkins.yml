@@ -115,12 +115,6 @@ Resources:
           packages:
             yum:
               jenkins: []
-          # files:
-          #   /etc/sysconfig/jenkins:
-          #     source: !Sub https://raw.githubusercontent.com/${GitHubOwner}/aws-devsecops-workshop/${GitHubBranch}/provisioning/jenkins/sysconfig_jenkins
-          #     mode: '000600'
-          #     owner: root
-          #     group: root
           services:
             sysvinit:
               jenkins:
@@ -212,7 +206,7 @@ Resources:
               group: root
           packages:
             yum:
-              nginx: []
+              nginx: ["1.16.1"]
           services:
             sysvinit:
               nginx:

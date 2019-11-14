@@ -1,8 +1,9 @@
 # Current Issues
 
 ### CFN-INIT
-- Ansible is not installing.
+- Ansible is not installing through `packages > ansible`.
 - CFN signal not occuring causing stack to roll back
+- Temp fix : `pip install ansible` in UserData.
 
 ### Jenkins Instance
 - After temp removing the cfn signal resource on instance creation policy, several issues ocuring within Jenkins server instance

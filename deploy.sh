@@ -68,13 +68,13 @@ aws cloudformation deploy \
   --no-fail-on-empty-changeset \
   --parameter-overrides ${JENKINS_PARAMETERS}
 
-echo -e "\n\nDeploying DevSecOps Workshop ConfigService Stacks:\n\n"
-for CONFIG_TEMPLATE_PATH in $(ls provisioning/cloudformation/templates/configservice/); do
-  CONFIG_TEMPLATE_NAME=$(echo $CONFIG_TEMPLATE_PATH | cut -f1 -d\. | sed 's|_|-|g')
-  aws cloudformation deploy \
-    --profile ${AWS_PROFILE} \
-    --region ${AWS_REGION} \
-    --stack-name AWS-DEVSECOPS-WORKSHOP-CONFIGSERVICE-${CONFIG_TEMPLATE_NAME} \
-    --template-file ./provisioning/cloudformation/templates/configservice/${CONFIG_TEMPLATE_PATH} \
-    --no-fail-on-empty-changeset
-done
+# echo -e "\n\nDeploying DevSecOps Workshop ConfigService Stacks:\n\n"
+# for CONFIG_TEMPLATE_PATH in $(ls provisioning/cloudformation/templates/configservice/); do
+#   CONFIG_TEMPLATE_NAME=$(echo $CONFIG_TEMPLATE_PATH | cut -f1 -d\. | sed 's|_|-|g')
+#   aws cloudformation deploy \
+#     --profile ${AWS_PROFILE} \
+#     --region ${AWS_REGION} \
+#     --stack-name AWS-DEVSECOPS-WORKSHOP-CONFIGSERVICE-${CONFIG_TEMPLATE_NAME} \
+#     --template-file ./provisioning/cloudformation/templates/configservice/${CONFIG_TEMPLATE_PATH} \
+#     --no-fail-on-empty-changeset
+# done
