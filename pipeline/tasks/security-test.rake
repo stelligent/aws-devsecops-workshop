@@ -5,13 +5,28 @@ require 'pipeline/inspector'
 require 'pipeline/penetration'
 require 'pipeline/configservice'
 
+# namespace :commit do
+#   desc 'Static security tests'
+#   task :security_test do
+#     puts "\n\nCFN-NAG Static security tests"
+#     cfn_template = 'provisioning/cloudformation/templates/workshop-jenkins.yml'
+#     failures = CfnNag.new.audit_aggregate_across_files_and_render_results(input_path: File.open(cfn_template))
+#     raise "CFN Nag found #{failures} issue(s)." unless failures.to_i.zero?
+#   end
+# end
+
 namespace :commit do
   desc 'Static security tests'
   task :security_test do
     puts "\n\nCFN-NAG Static security tests"
-    cfn_template = 'provisioning/cloudformation/templates/workshop-jenkins.yml'
-    failures = CfnNag.new.audit_aggregate_across_files_and_render_results(input_path: File.open(cfn_template))
-    raise "CFN Nag found #{failures} issue(s)." unless failures.to_i.zero?
+    #cfn_templates_path = "~/StelligentRepos/aws-devsecops-workshop/provisioning/cloudformation/templates/"
+    cfn_templates_path = "#{Dir.pwd}/provisioning/cloudformation/templates/"
+    cfn_nag_rules_dir = "#{Dir.pwd}/pipeline/lib/cfn_nag/lib/cfn-nag/custom_rules/"
+    puts cfn_templates_path
+    system("cfn_nag_scan --rule-directory #{cfn_nag_rules_dir} --input-path #{cfn_templates_path}")
+    # cfn_model = CfnParser.new.parse read_test_template
+    # failures = CfnNag.audit_aggregate_across_files_and_render_results(input_path: File.open(cfn_template))
+    # raise "CFN Nag found #{failures} issue(s)." unless failures.to_i.zero?
   end
 end
 
