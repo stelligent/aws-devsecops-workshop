@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :commit do
   desc 'Build application'
   task :build do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'cfn-nag'
 require 'pipeline/inspector'
 require 'pipeline/penetration'

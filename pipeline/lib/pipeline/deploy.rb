@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'aws-sdk'
 require 'eat'
 require 'pipeline/state'
@@ -16,6 +18,7 @@ module Pipeline
 
     def deploy
       return create_stack unless stack_exists
+
       update_stack
     end
 

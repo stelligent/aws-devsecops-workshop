@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :commit do
   desc 'Static analysis tests'
   task static_analysis: [:rubocop]

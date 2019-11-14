@@ -22,3 +22,8 @@ NumericLiteralPrefix:
 
 Metrics/LineLength:
   Max: 120
+
+Naming/FileName:
+  Description: 'Use snake_case for source file names.'
+  StyleGuide: '#snake-case-files'
+  Enabled: false
