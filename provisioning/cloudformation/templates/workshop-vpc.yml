@@ -28,15 +28,6 @@ Parameters:
     Description: The Amazon CIDR block.
 
 Resources:
-  # InternetGatewayStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: https://s3.amazonaws.com/aws-devsecops-workshop/workshop-igw.template
-  #     Parameters:
-  #       ParentStackName: !Ref 'AWS::StackName'
-  #       VPC: !Ref 'JenkinsVPC'
-  #     TimeoutInMinutes: '10'
-
   InternetGateWay:
     Type: AWS::EC2::InternetGateway
     Properties: 
@@ -79,14 +70,6 @@ Resources:
       Tags:
         - Key: Name
           Value: !Ref 'AWS::StackName'
-
-  # JenkinsRoute:
-  #   Type: AWS::EC2::Route
-  #   DependsOn: InternetGatewayStack
-  #   Properties:
-  #     RouteTableId: !Ref 'JenkinsRouteTable'
-  #     DestinationCidrBlock: '0.0.0.0/0'
-  #     GatewayId: !GetAtt 'InternetGatewayStack.Outputs.Gateway'
 
   JenkinsRoute:
     Type: AWS::EC2::Route
