@@ -25,48 +25,46 @@ node('master') {
           sh 'rake commit:security_test'
 
           // Unit Tests for CFN_NAG custom rules
-          ansiColor('xterm') {
-            sh 'rake commit:cfn_nag_unit_tests'
-          }
+          sh 'rake commit:cfn_nag_unit_tests'
         }
       }
 
-      // stage('Acceptance') {
-      //   def region = env.AWS_REGION == null ? 'us-east-1' : env.AWS_REGION
-      //   withEnv(['PATH=/sbin:/usr/sbin:/bin:/usr/bin:/var/lib/jenkins/bin:/usr/local/bin']) {
-      //     // Create Acceptance Environment
-      //     sh 'rake acceptance:create_environment'
+      stage('Acceptance') {
+        def region = env.AWS_REGION == null ? 'us-east-1' : env.AWS_REGION
+        withEnv(['PATH=/sbin:/usr/sbin:/bin:/usr/bin:/var/lib/jenkins/bin:/usr/local/bin']) {
+          // Create Acceptance Environment
+          sh 'rake acceptance:create_environment'
 
-      //     // Infrastructure Tests
-      //     sh 'rake acceptance:infrastructure_test'
+          // Infrastructure Tests
+          sh 'rake acceptance:infrastructure_test'
 
-      //     // Integration Tests
-      //     sh 'rake acceptance:integration_test'
+          // Integration Tests
+          sh 'rake acceptance:integration_test'
 
-      //     // Security / Integration Tests
-      //     sh 'rake acceptance:security_test'
-      //   }
-      // }
+          // Security / Integration Tests
+          sh 'rake acceptance:security_test'
+        }
+      }
 
-      // stage('Capacity') {
-      //   withEnv(['PATH=/sbin:/usr/sbin:/bin:/usr/bin:/var/lib/jenkins/bin:/usr/local/bin']) {
-      //     // Security / Penetration Tests
-      //     sh 'rake capacity:security_test'
+      stage('Capacity') {
+        withEnv(['PATH=/sbin:/usr/sbin:/bin:/usr/bin:/var/lib/jenkins/bin:/usr/local/bin']) {
+          // Security / Penetration Tests
+          sh 'rake capacity:security_test'
 
-      //     // Capacity Test
-      //     sh 'rake capacity:capacity_test'
-      //   }
-      // }
+          // Capacity Test
+          sh 'rake capacity:capacity_test'
+        }
+      }
 
-      // stage('Deployment') {
-      //   withEnv(['PATH=/sbin:/usr/sbin:/bin:/usr/bin:/var/lib/jenkins/bin:/usr/local/bin']) {
-      //     // Deployment
-      //     sh 'rake deployment:production'
+      stage('Deployment') {
+        withEnv(['PATH=/sbin:/usr/sbin:/bin:/usr/bin:/var/lib/jenkins/bin:/usr/local/bin']) {
+          // Deployment
+          sh 'rake deployment:production'
 
-      //     // Deployment Verification
-      //     sh 'rake deployment:smoke_test'
-      //   }
-      // }
+          // Deployment Verification
+          sh 'rake deployment:smoke_test'
+        }
+      }
 
   }
 
