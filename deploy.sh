@@ -2,7 +2,7 @@
 
 AWS_PROFILE=default
 AWS_REGION=us-east-1
-INSTANCE_TYPE=t2.micro
+INSTANCE_TYPE=t2.small
 JENKINS_STACK_NAME=AWS-DEVSECOPS-WORKSHOP-JENKINS
 VPC_STACK_NAME=AWS-DEVSECOPS-WORKSHOP-VPC
 JENKINS_STACK_TEMPLATE=./provisioning/cloudformation/templates/workshop-jenkins.yml
@@ -13,7 +13,7 @@ OWASP_ZAP_VERSION=2.5.0
 IMAGE_ID=ami-00eb20669e0990cb4  # latest amzn linux
 SSH_KEY_NAME=devsecops
 GITHUB_OWNER=stelligent
-GITHUB_BRANCH=update_cfn_nag
+GITHUB_BRANCH=master
 
 # allow outbound traffic
 RUBYGEMS_CIDR=151.101.0.0/16

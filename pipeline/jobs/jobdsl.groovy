@@ -9,7 +9,7 @@ pipelineJob('aws-devsecops-workshop') {
     cpsScm {
       scm {
         git {
-          branch('update_cfn_nag')
+          branch('master')
           remote {
             url('https://github.com/stelligent/aws-devsecops-workshop.git')
           }
