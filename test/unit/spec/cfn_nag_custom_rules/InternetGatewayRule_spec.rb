@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../spec_helper'
 require 'cfn-model'
 require 'cfn_nag/lib/cfn-nag/custom_rules/InternetGatewayRule'

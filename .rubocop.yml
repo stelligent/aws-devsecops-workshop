@@ -3,7 +3,7 @@ AllCops:
     - 'inspector-status/**/*'
     - 'features/**/*'
     - 'pipeline/lib/cfn_nag/**/*'
-    - 'pipeline/tasks/security-test.rake'
+    - 'test/unit/spec/spec_helper.rb'
 
 # CloudFormation DSL
 BlockLength:

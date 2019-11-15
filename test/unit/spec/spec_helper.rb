@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $LOAD_PATH << './pipeline/lib'
 
 require 'simplecov'
