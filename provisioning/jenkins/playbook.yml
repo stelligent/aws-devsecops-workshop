@@ -83,10 +83,15 @@
         name: jenkins
         state: restarted
 
-    - name: sleep for 20 seconds and continue with play
+    - name: sleep for 20 seconds to allow Jenkins service to spin back up
       wait_for:
         timeout: 20
       delegate_to: localhost
+
+    - name: Remove Jenkins config file from /root directory
+      file:
+        path: /root/config.xml
+        state: absent
 
     - name: set jenkins admin password fact
       set_fact:

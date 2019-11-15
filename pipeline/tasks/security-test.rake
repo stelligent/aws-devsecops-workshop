@@ -11,7 +11,6 @@ namespace :commit do
     puts "\n\nCFN-NAG Static security tests"
     cfn_templates_path = "#{Dir.pwd}/provisioning/cloudformation/templates/"
     cfn_nag_rules_dir = "#{Dir.pwd}/pipeline/lib/cfn_nag/lib/cfn-nag/custom_rules/"
-    puts cfn_templates_path
     system("cfn_nag_scan --rule-directory #{cfn_nag_rules_dir} --input-path #{cfn_templates_path}")
   end
 end

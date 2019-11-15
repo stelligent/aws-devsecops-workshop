@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS DevSecOps Workshop Environment
+
+Resources:
+  InternetGateWay:
+    Type: AWS::EC2::InternetGateway
+    Properties: 
+      Tags: 
+        - Key: Template Function
+          Value: CFN_NAG testing
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: !Ref 'InternetGateWay'
+      VpcId: !Ref 'JenkinsVPC'
+
+  JenkinsVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: '10.10.21.0/22'
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'

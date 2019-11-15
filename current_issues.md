@@ -21,5 +21,6 @@ Disabling this all together and re-running the playbook manually via CLI does su
 - Consideration for using Amazon Linux 2 AMI? This would require modifying cfn-init to use `systemd` instead of `sysinitv`
 
 ### TODO
-- Install ansible on Jenkins Server through different means.
-- Change Jenkins config XML settings file to disable CSRF Protection for time being.
+- ~Install ansible on Jenkins Server through `pip install ansible` in UserData~
+- ~Change Jenkins config XML settings file to disable CSRF Protection for time being and pull down file into server to then replace 
+Jenkins main config.xml file~

@@ -24,8 +24,8 @@ node('master') {
           // Security / Static Analysis
           sh 'rake commit:security_test'
 
-          // Unit Tests
-          sh 'rake commit:unit_test'
+          // Unit Tests for CFN_NAG custom rules
+          sh 'rake commit:cfn_nag_unit_tests'
         }
       }
 
