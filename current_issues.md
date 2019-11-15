@@ -19,8 +19,15 @@ Disabling this all together and re-running the playbook manually via CLI does su
 - Python version is still 2.7
 - Pip version is very out of date (v9.03)
 - Consideration for using Amazon Linux 2 AMI? This would require modifying cfn-init to use `systemd` instead of `sysinitv`
+- Acceptance stage in pipeline usually takes \~14-16 mins long.
 
-### TODO
-- ~Install ansible on Jenkins Server through `pip install ansible` in UserData~
-- ~Change Jenkins config XML settings file to disable CSRF Protection for time being and pull down file into server to then replace 
-Jenkins main config.xml file~
+### Changes to Implement
+- Install ansible on Jenkins Server through `pip install ansible` in UserData
+- Change Jenkins config XML settings file to disable CSRF Protection for time being and pull down file into server to then replace 
+Jenkins main config.xml file
+- Add task in playbook.yml for copying the jenkins config.xml file to `/var/lib/jenkins/config.xml`
+- Modify Jenkinsfile to remove build custom cfn_nag rules rake task
+- Update cfn_nag version/new bundle install and Gemfile.lock
+- Refactors igw cfn_nag rule to work with latest version. Also changed rake task for security testing ro run a `cfn_nag_scan` against all templates in a specified location.
+(Previously was only running `cfn_nag` again a single template.)
+- Added unit tests for cfn_nag custom rules and rake task associated with it
