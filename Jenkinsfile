@@ -25,7 +25,9 @@ node('master') {
           sh 'rake commit:security_test'
 
           // Unit Tests for CFN_NAG custom rules
-          sh 'rake commit:cfn_nag_unit_tests'
+          ansiColor('xterm') {
+            sh 'rake commit:cfn_nag_unit_tests'
+          }
         }
       }
 
