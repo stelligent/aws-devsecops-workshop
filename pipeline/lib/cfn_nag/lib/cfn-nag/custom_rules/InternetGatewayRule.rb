@@ -17,9 +17,7 @@ class InternetGatewayRule < BaseRule
   end
 
 	def audit_impl(cfn_model)
-		violating_resources = cfn_model.resources_by_type('AWS::EC2::InternetGateway').select do |igw|
-		  !igw.nil?
-		end
+    violating_resources = cfn_model.resources_by_type('AWS::EC2::InternetGateway')
 
 		violating_resources.map(&:logical_resource_id)
 	end  
