@@ -83,9 +83,9 @@
         name: jenkins
         state: restarted
 
-    - name: sleep for 20 seconds to allow Jenkins service to spin back up
+    - name: sleep for 25 seconds to allow Jenkins service to spin back up
       wait_for:
-        timeout: 20
+        timeout: 25
       delegate_to: localhost
 
     # - name: Remove Jenkins config file from /root directory
@@ -161,7 +161,7 @@
         regexp: 'NEW'
         replace: 'RUNNING'
 
-    - name: restart jenkins
+    - name: restart2 jenkins
       service:
         name: jenkins
         state: restarted
