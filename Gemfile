@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
 gem 'ast'
@@ -10,3 +12,4 @@ gem 'json'
 gem 'rspec'
 gem 'rubocop'
 gem 'serverspec'
+gem 'simplecov'

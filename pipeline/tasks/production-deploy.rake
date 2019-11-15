@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :deployment do
   desc 'Deploy the production environment'
   task :production do

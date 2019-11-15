@@ -70,6 +70,24 @@
       - lockable-resources
 
   tasks:
+    - name: replace jenkins config
+      copy:
+        src: /root/config.xml
+        dest: /var/lib/jenkins/config.xml
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
+    - name: restart1 jenkins
+      service:
+        name: jenkins
+        state: restarted
+
+    - name: sleep for 25 seconds to allow Jenkins service to spin back up
+      wait_for:
+        timeout: 25
+      delegate_to: localhost
+
     - name: set jenkins admin password fact
       set_fact:
         jenkins_admin_password: "{{ lookup('file', jenkins_admin_password_file) }}"
@@ -138,7 +156,7 @@
         regexp: 'NEW'
         replace: 'RUNNING'
 
-    - name: restart jenkins
+    - name: restart2 jenkins
       service:
         name: jenkins
         state: restarted

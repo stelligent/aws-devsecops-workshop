@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'aws-sdk'
 require 'pipeline/cfn_helper'
 
@@ -7,6 +9,7 @@ module Pipeline
   class CloudFormationHelper
     def aws_region
       return 'us-east-1' if ENV['AWS_REGION'].nil?
+
       ENV['AWS_REGION']
     end
 
@@ -67,10 +70,10 @@ module Pipeline
     def delete_old_keypair(key_path)
       @ec2.delete_key_pair(key_name: stack_name)
       File.delete(key_path) if File.exist?(key_path)
-    rescue Aws::EC2::Errors::InvalidKeyPairNotFound => error
-      puts error # noop
-    rescue RuntimeError => error
-      puts error # noop
+    rescue Aws::EC2::Errors::InvalidKeyPairNotFound => e
+      puts e # noop
+    rescue RuntimeError => e
+      puts e # noop
     end
 
     def stack_exists

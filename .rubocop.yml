@@ -3,6 +3,7 @@ AllCops:
     - 'inspector-status/**/*'
     - 'features/**/*'
     - 'pipeline/lib/cfn_nag/**/*'
+    - 'test/unit/spec/spec_helper.rb'
 
 # CloudFormation DSL
 BlockLength:
@@ -22,3 +23,8 @@ NumericLiteralPrefix:
 
 Metrics/LineLength:
   Max: 120
+
+Naming/FileName:
+  Description: 'Use snake_case for source file names.'
+  StyleGuide: '#snake-case-files'
+  Enabled: false

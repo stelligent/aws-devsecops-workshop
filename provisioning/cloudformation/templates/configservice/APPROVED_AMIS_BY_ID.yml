@@ -31,7 +31,7 @@ Parameters:
     Description: Specify AMI IDs (comma separated list of up to 10).
     MinLength: '1'
     ConstraintDescription: This parameter is required.
-    Default: ami-97785bed
+    Default: ami-00eb20669e0990cb4
 
 Metadata:
   AWS::CloudFormation::Interface:

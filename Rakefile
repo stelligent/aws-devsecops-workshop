@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $LOAD_PATH << './pipeline/lib'
 
 # Load any .rake files under the current directory

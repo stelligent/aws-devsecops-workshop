@@ -61,6 +61,8 @@ We recommend using a new AWS account for the workshop environment. You can also 
   `./deploy.sh`
 - TRUSTED_CIDR is expected to be exported in the environment (example: "export TRUSTED_CIDR=100.20.30.45/32")
 - Variables at the top of `deploy.sh` may need to be customized.
+    - `IMAGE_ID` variable is currently set to the latest Amazon Linux AMI for the **us-east-1** region. If deploying this into another region you must replace this variable's value with the correct AMI ID for the other region.
+
 
 
 ## Egress Rules

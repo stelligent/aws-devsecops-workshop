@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'cfn-nag'
 require 'pipeline/inspector'
 require 'pipeline/penetration'
@@ -7,9 +9,9 @@ namespace :commit do
   desc 'Static security tests'
   task :security_test do
     puts "\n\nCFN-NAG Static security tests"
-    cfn_template = 'provisioning/cloudformation/templates/workshop-jenkins.yml'
-    failures = CfnNag.new.audit_aggregate_across_files_and_render_results(input_path: File.open(cfn_template))
-    raise "CFN Nag found #{failures} issue(s)." unless failures.to_i.zero?
+    cfn_templates_path = "#{Dir.pwd}/provisioning/cloudformation/templates/"
+    cfn_nag_rules_dir = "#{Dir.pwd}/pipeline/lib/cfn_nag/lib/cfn-nag/custom_rules/"
+    system("cfn_nag_scan --rule-directory #{cfn_nag_rules_dir} --input-path #{cfn_templates_path} --output-format=txt")
   end
 end
 
