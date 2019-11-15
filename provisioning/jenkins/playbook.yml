@@ -88,11 +88,6 @@
         timeout: 25
       delegate_to: localhost
 
-    # - name: Remove Jenkins config file from /root directory
-    #   file:
-    #     path: /root/config.xml
-    #     state: absent
-
     - name: set jenkins admin password fact
       set_fact:
         jenkins_admin_password: "{{ lookup('file', jenkins_admin_password_file) }}"
