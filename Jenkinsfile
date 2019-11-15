@@ -12,8 +12,8 @@ node('master') {
           sh 'bundle install'
           // sh 'bundle info cfn-nag | grep Path | cut -f2 -d" " > cfn-nag.path'
 
-          // // Build
-          // sh 'rake commit:build'
+          // Build
+          sh 'rake commit:build'
 
           // // Configure CFN_Nag
           // sh 'rake commit:cfn_nag:rules'

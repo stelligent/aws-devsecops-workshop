@@ -39,10 +39,10 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref JenkinsLaunchTemplate
         Version: 1
-    # CreationPolicy:
-    #   ResourceSignal:    
-    #     Count: 1
-    #     Timeout: PT10M
+    CreationPolicy:
+      ResourceSignal:    
+        Count: 1
+        Timeout: PT10M
 
   JenkinsLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
